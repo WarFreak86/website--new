@@ -167,17 +167,9 @@
               >
                 Sale
               </span>
-              <span
-                class="product-badge product-badge--sold{% if product.selected_or_first_available_variant.available %} is-hidden{% endif %}"
-                data-sold-badge
-              >
-                Sold out
-              </span>
-              <span class="product-badge product-badge--unavailable is-hidden" data-unavailable-badge>Unavailable</span>
             </div>
 
             {% render 'price', product_or_variant: product.selected_or_first_available_variant %}
-            <p class="collector-product__availability" data-availability-message aria-live="polite"></p>
 
             {%- if section.settings.product_description_position == 'below_price' -%}
               {{ featured_description_markup }}
@@ -622,7 +614,7 @@
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 80%, white 20%);
   }
 
-  #shopify-section-{{ section.id }} .premium-option-card.is-unavailable:not(.is-selected) {
+  #shopify-section-{{ section.id }} .premium-option-card.is-disabled:not(.is-selected) {
     opacity: 0.46;
     cursor: not-allowed;
     transform: none;
@@ -656,12 +648,6 @@
     outline: none;
     border-color: var(--product-panel-accent, #C6FF3D);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 40%, transparent);
-  }
-
-  #shopify-section-{{ section.id }} .collector-product__availability {
-    margin: -0.1rem 0 0;
-    font-size: 0.86rem;
-    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 72%, white 28%);
   }
 
   #shopify-section-{{ section.id }} .collector-product__buying-cues {
@@ -716,11 +702,6 @@
     cursor: not-allowed;
   }
 
-  #shopify-section-{{ section.id }} .product-badge--unavailable {
-    border-color: #ff8a80;
-    color: #ffb3ad;
-  }
-
   #shopify-section-{{ section.id }} .collector-product__buying-cues {
     margin-top: 0.15rem;
     padding: 0.9rem 0.95rem;
@@ -742,11 +723,6 @@
 
   #shopify-section-{{ section.id }} .collector-product__trust-heading + .collector-product__cue {
     margin-top: 0.45rem;
-  }
-
-  #shopify-section-{{ section.id }} .collector-product__cue--low-stock {
-    color: var(--ds-color-text-strong, #F4EFE6);
-    font-weight: 600;
   }
 
   #shopify-section-{{ section.id }} .collector-product__info--panels {
@@ -898,7 +874,6 @@
       {
         "id": {{ variant.id | json }},
         "options": {{ variant.options | json }},
-        "available": {{ variant.available | json }},
         "price": {{ variant.price | json }},
         "compare_at_price": {{ variant.compare_at_price | json }},
         "featured_media": {%- if variant.featured_media -%}{ "id": {{ variant.featured_media.id | json }} }{%- else -%}null{%- endif -%}
@@ -1306,7 +1281,7 @@
       "settings": [
         { "type": "checkbox", "id": "show_block", "label": "Show this block", "default": true },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Materials & Finish" },
-        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Available as gallery-grade canvas or metal print options depending on the product variant setup.</p>" }
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Offered as gallery-grade canvas or metal print options depending on the product variant setup.</p>" }
       ]
     },
     {

@@ -104,9 +104,6 @@ function initProductSection(sectionRoot) {
   var addButton = productForm.querySelector('button[name="add"], [data-add-to-cart]');
   var priceContainer = sectionRoot.querySelector('[data-price-root], .price');
   var saleBadge = sectionRoot.querySelector('[data-sale-badge]');
-  var soldBadge = sectionRoot.querySelector('[data-sold-badge]');
-  var unavailableBadge = sectionRoot.querySelector('[data-unavailable-badge]');
-  var availabilityMessage = sectionRoot.querySelector('[data-availability-message]');
   var quantityInput = productForm.querySelector('input[name="quantity"]');
   var quantityIncrease = productForm.querySelector('[data-quantity-increase]');
   var quantityDecrease = productForm.querySelector('[data-quantity-decrease]');
@@ -152,10 +149,10 @@ function initProductSection(sectionRoot) {
     });
   }
 
-  function optionValueHasAvailableVariant(position, value) {
+  function optionValueHasVariant(position, value) {
     var selectedOptions = getSelectedOptionsWithOverride(position, value);
     return variants.some(function (variant) {
-      if (!variant || !variant.available || !Array.isArray(variant.options)) {
+      if (!variant || !Array.isArray(variant.options)) {
         return false;
       }
       return selectedOptions.every(function (selectedValue, index) {
@@ -176,18 +173,18 @@ function initProductSection(sectionRoot) {
       group.cards.forEach(function (card) {
         var value = card.getAttribute('data-option-value') || '';
         var isSelected = value === selectedValue;
-        var isAvailable = optionValueHasAvailableVariant(group.position, value);
-        var isDisabled = !isAvailable && !isSelected;
+        var hasVariant = optionValueHasVariant(group.position, value);
+        var isDisabled = !hasVariant && !isSelected;
         var stateText = card.querySelector('[data-option-state]');
 
         card.classList.toggle('is-selected', isSelected);
-        card.classList.toggle('is-unavailable', !isAvailable);
+        card.classList.toggle('is-disabled', !hasVariant);
         card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
         card.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
         card.disabled = isDisabled;
 
         if (stateText) {
-          stateText.textContent = isSelected ? 'Selected' : isAvailable ? 'Available' : 'Unavailable';
+          stateText.textContent = isSelected ? 'Selected' : '';
         }
 
         if (isSelected || (!focusableCard && !isDisabled)) {
@@ -223,23 +220,23 @@ function initProductSection(sectionRoot) {
   }
 
   function movePremiumOptionFocus(group, currentCard, direction) {
-    var availableCards = group.cards.filter(function (card) {
+    var enabledCards = group.cards.filter(function (card) {
       return !card.disabled && card.getAttribute('aria-disabled') !== 'true';
     });
-    if (!availableCards.length) {
+    if (!enabledCards.length) {
       return;
     }
 
-    var currentIndex = availableCards.indexOf(currentCard);
+    var currentIndex = enabledCards.indexOf(currentCard);
     var nextIndex = currentIndex >= 0 ? currentIndex + direction : 0;
 
     if (nextIndex < 0) {
-      nextIndex = availableCards.length - 1;
-    } else if (nextIndex >= availableCards.length) {
+      nextIndex = enabledCards.length - 1;
+    } else if (nextIndex >= enabledCards.length) {
       nextIndex = 0;
     }
 
-    availableCards[nextIndex].focus();
+    enabledCards[nextIndex].focus();
   }
 
   function initPremiumOptionCards() {
@@ -344,24 +341,16 @@ function initProductSection(sectionRoot) {
 
     if (!variant) {
       addButton.disabled = true;
-      addButton.textContent = 'Unavailable';
-      if (soldBadge) soldBadge.classList.add('is-hidden');
       if (saleBadge) saleBadge.classList.add('is-hidden');
-      if (unavailableBadge) unavailableBadge.classList.remove('is-hidden');
-      if (availabilityMessage) availabilityMessage.textContent = 'This option combination is unavailable.';
+      addButton.textContent = 'Add to cart';
       return;
     }
 
-    addButton.disabled = !variant.available;
-    addButton.textContent = variant.available ? 'Add to cart' : 'Sold out';
+    addButton.disabled = false;
+    addButton.textContent = 'Add to cart';
 
-    if (soldBadge) soldBadge.classList.toggle('is-hidden', variant.available);
-    if (unavailableBadge) unavailableBadge.classList.add('is-hidden');
     if (saleBadge) {
       saleBadge.classList.toggle('is-hidden', !(Number(variant.compare_at_price) > Number(variant.price)));
-    }
-    if (availabilityMessage) {
-      availabilityMessage.textContent = variant.available ? 'Available' : 'Sold out';
     }
   }
 

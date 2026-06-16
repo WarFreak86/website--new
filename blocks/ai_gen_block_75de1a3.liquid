@@ -1,6 +1,6 @@
 {% doc %}
   @prompt
-    Create a lightweight JavaScript snippet or block that listens for variant changes on the product page and updates the displayed price, compare-at price, and unit price to match the selected variant. It should work with the existing theme's price elements without replacing them, handling cases where the price display is outside the standard variant picker section. Should also handle sold-out and unavailable variant states.
+    Create a lightweight JavaScript snippet or block that listens for variant changes on the product page and updates the displayed price, compare-at price, and unit price to match the selected variant. It should work with the existing theme's price elements without replacing them, handling cases where the price display is outside the standard variant picker section.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
@@ -21,9 +21,6 @@
   data-price-selector="{{ block.settings.price_selector }}"
   data-compare-price-selector="{{ block.settings.compare_price_selector }}"
   data-unit-price-selector="{{ block.settings.unit_price_selector }}"
-  data-availability-selector="{{ block.settings.availability_selector }}"
-  data-sold-out-text="{{ block.settings.sold_out_text }}"
-  data-unavailable-text="{{ block.settings.unavailable_text }}"
   data-enable-logging="{{ block.settings.enable_logging }}"
   {{ block.shopify_attributes }}
 ></variant-price-updater-{{ ai_gen_id }}>
@@ -36,9 +33,6 @@
         this.priceSelector = this.dataset.priceSelector || '.price';
         this.comparePriceSelector = this.dataset.comparePriceSelector || '.price--compare';
         this.unitPriceSelector = this.dataset.unitPriceSelector || '.unit-price';
-        this.availabilitySelector = this.dataset.availabilitySelector || '.product-availability';
-        this.soldOutText = this.dataset.soldOutText || 'Sold out';
-        this.unavailableText = this.dataset.unavailableText || 'Unavailable';
         this.enableLogging = this.dataset.enableLogging === 'true';
       }
 
@@ -136,7 +130,6 @@
         const priceElements = document.querySelectorAll(this.priceSelector);
         const comparePriceElements = document.querySelectorAll(this.comparePriceSelector);
         const unitPriceElements = document.querySelectorAll(this.unitPriceSelector);
-        const availabilityElements = document.querySelectorAll(this.availabilitySelector);
 
         if (!variant) {
           this.log('No variant provided');
@@ -187,18 +180,6 @@
           }
         }
 
-        if (availabilityElements.length > 0) {
-          availabilityElements.forEach((el) => {
-            if (!variant.available) {
-              el.textContent = this.soldOutText;
-              el.style.display = '';
-              this.log('Updated availability to sold out', { element: el });
-            } else {
-              el.style.display = 'none';
-              this.log('Hidden availability element', { element: el });
-            }
-          });
-        }
       }
 
       formatMoney(cents) {
@@ -266,28 +247,6 @@
       "id": "unit_price_selector",
       "label": "Unit price selector",
       "default": ".unit-price"
-    },
-    {
-      "type": "text",
-      "id": "availability_selector",
-      "label": "Availability selector",
-      "default": ".product-availability"
-    },
-    {
-      "type": "header",
-      "content": "Availability text"
-    },
-    {
-      "type": "text",
-      "id": "sold_out_text",
-      "label": "Sold out text",
-      "default": "Sold out"
-    },
-    {
-      "type": "text",
-      "id": "unavailable_text",
-      "label": "Unavailable text",
-      "default": "Unavailable"
     },
     {
       "type": "header",
