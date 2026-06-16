@@ -160,15 +160,6 @@
               <p class="collector-product__hook">{{ section.settings.product_hook | escape }}</p>
             {%- endif -%}
 
-            <div class="main-product__meta" data-product-meta>
-              <span
-                class="product-badge product-badge--sale{% unless product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %} is-hidden{% endunless %}"
-                data-sale-badge
-              >
-                Sale
-              </span>
-            </div>
-
             {% render 'price', product_or_variant: product.selected_or_first_available_variant %}
 
             {%- if section.settings.product_description_position == 'below_price' -%}
@@ -789,10 +780,6 @@
   #shopify-section-{{ section.id }} .collector-product__panel .rte,
   #shopify-section-{{ section.id }} .collector-product__app-block {
     color: var(--ds-color-text, #F4EFE6);
-  }
-
-  #shopify-section-{{ section.id }} .product-badge.is-hidden {
-    display: none;
   }
 
   @media (max-width: 749px) {

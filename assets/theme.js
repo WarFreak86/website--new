@@ -103,7 +103,6 @@ function initProductSection(sectionRoot) {
   var variantIdInput = productForm.querySelector('input[name="id"][data-variant-id-input]');
   var addButton = productForm.querySelector('button[name="add"], [data-add-to-cart]');
   var priceContainer = sectionRoot.querySelector('[data-price-root], .price');
-  var saleBadge = sectionRoot.querySelector('[data-sale-badge]');
   var quantityInput = productForm.querySelector('input[name="quantity"]');
   var quantityIncrease = productForm.querySelector('[data-quantity-increase]');
   var quantityDecrease = productForm.querySelector('[data-quantity-decrease]');
@@ -175,17 +174,12 @@ function initProductSection(sectionRoot) {
         var isSelected = value === selectedValue;
         var hasVariant = optionValueHasVariant(group.position, value);
         var isDisabled = !hasVariant && !isSelected;
-        var stateText = card.querySelector('[data-option-state]');
 
         card.classList.toggle('is-selected', isSelected);
         card.classList.toggle('is-disabled', !hasVariant);
         card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
         card.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
         card.disabled = isDisabled;
-
-        if (stateText) {
-          stateText.textContent = isSelected ? 'Selected' : '';
-        }
 
         if (isSelected || (!focusableCard && !isDisabled)) {
           focusableCard = card;
@@ -341,17 +335,12 @@ function initProductSection(sectionRoot) {
 
     if (!variant) {
       addButton.disabled = true;
-      if (saleBadge) saleBadge.classList.add('is-hidden');
       addButton.textContent = 'Add to cart';
       return;
     }
 
     addButton.disabled = false;
     addButton.textContent = 'Add to cart';
-
-    if (saleBadge) {
-      saleBadge.classList.toggle('is-hidden', !(Number(variant.compare_at_price) > Number(variant.price)));
-    }
   }
 
   function updateUrl(variant) {
