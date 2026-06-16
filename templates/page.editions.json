@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "hero": { "type": "lore-page-hero", "settings": { "eyebrow": "Edition Catalog", "heading": "Editions", "text": "<p>Collector runs organized by format, release window, and archive status.</p>" } },
+    "timeline": {
+      "type": "lore-timeline",
+      "settings": { "eyebrow": "Edition Notes", "heading": "Edition Framework" },
+      "blocks": {
+        "entry_a": {"type":"entry","settings":{"label":"Open Release","heading":"Timed Availability","text":"<p>Available during a defined release window before moving to archive status.</p>"}},
+        "entry_b": {"type":"entry","settings":{"label":"Limited Run","heading":"Restricted Allocation","text":"<p>Small-batch editions with finite quantity and no guaranteed restock.</p>"}},
+        "entry_c": {"type":"entry","settings":{"label":"Archive Piece","heading":"Collector Hold","text":"<p>Closed releases preserved as reference entries inside the Render-Lab archive.</p>"}}
+      },
+      "block_order": ["entry_a","entry_b","entry_c"]
+    }
+  },
+  "order": ["hero", "timeline"]
+}

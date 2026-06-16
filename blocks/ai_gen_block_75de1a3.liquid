@@ -1,0 +1,309 @@
+{% doc %}
+  @prompt
+    Create a lightweight JavaScript snippet or block that listens for variant changes on the product page and updates the displayed price, compare-at price, and unit price to match the selected variant. It should work with the existing theme's price elements without replacing them, handling cases where the price display is outside the standard variant picker section. Should also handle sold-out and unavailable variant states.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-variant-price-updater-{{ ai_gen_id }} {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+{% endstyle %}
+
+<variant-price-updater-{{ ai_gen_id }}
+  class="ai-variant-price-updater-{{ ai_gen_id }}"
+  data-price-selector="{{ block.settings.price_selector }}"
+  data-compare-price-selector="{{ block.settings.compare_price_selector }}"
+  data-unit-price-selector="{{ block.settings.unit_price_selector }}"
+  data-availability-selector="{{ block.settings.availability_selector }}"
+  data-sold-out-text="{{ block.settings.sold_out_text }}"
+  data-unavailable-text="{{ block.settings.unavailable_text }}"
+  data-enable-logging="{{ block.settings.enable_logging }}"
+  {{ block.shopify_attributes }}
+></variant-price-updater-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VariantPriceUpdater{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.priceSelector = this.dataset.priceSelector || '.price';
+        this.comparePriceSelector = this.dataset.comparePriceSelector || '.price--compare';
+        this.unitPriceSelector = this.dataset.unitPriceSelector || '.unit-price';
+        this.availabilitySelector = this.dataset.availabilitySelector || '.product-availability';
+        this.soldOutText = this.dataset.soldOutText || 'Sold out';
+        this.unavailableText = this.dataset.unavailableText || 'Unavailable';
+        this.enableLogging = this.dataset.enableLogging === 'true';
+      }
+
+      connectedCallback() {
+        this.log('Variant price updater initialized');
+        this.setupVariantChangeListener();
+      }
+
+      log(message, data) {
+        if (this.enableLogging) {
+          if (data) {
+            console.log('[Variant Price Updater]', message, data);
+          } else {
+            console.log('[Variant Price Updater]', message);
+          }
+        }
+      }
+
+      setupVariantChangeListener() {
+        document.addEventListener('variant:change', (event) => {
+          this.log('Variant change detected', event.detail);
+          if (event.detail && event.detail.variant) {
+            this.updatePriceDisplay(event.detail.variant);
+          }
+        });
+
+        const variantSelects = document.querySelectorAll('variant-selects, variant-radios, [name="id"]');
+        variantSelects.forEach((element) => {
+          if (element.tagName === 'SELECT' || element.tagName === 'INPUT') {
+            element.addEventListener('change', (e) => {
+              this.handleNativeVariantChange(e);
+            });
+          } else {
+            const observer = new MutationObserver(() => {
+              this.handleCustomVariantChange(element);
+            });
+            observer.observe(element, {
+              attributes: true,
+              attributeFilter: ['data-variant-id', 'data-selected-variant']
+            });
+          }
+        });
+
+        this.log('Variant change listeners attached');
+      }
+
+      handleNativeVariantChange(event) {
+        const variantId = event.target.value;
+        this.log('Native variant change', { variantId });
+        this.fetchAndUpdateVariant(variantId);
+      }
+
+      handleCustomVariantChange(element) {
+        const variantId = element.dataset.variantId || element.dataset.selectedVariant;
+        if (variantId) {
+          this.log('Custom variant change', { variantId });
+          this.fetchAndUpdateVariant(variantId);
+        }
+      }
+
+      fetchAndUpdateVariant(variantId) {
+        if (!variantId) return;
+
+        const productUrl = window.location.pathname;
+        fetch(`${productUrl}?variant=${variantId}&section_id=${this.getSectionId()}`)
+          .then((response) => response.text())
+          .then((html) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const scriptTag = doc.querySelector('script[type="application/json"][data-variant-json]');
+            
+            if (scriptTag) {
+              const variant = JSON.parse(scriptTag.textContent);
+              this.updatePriceDisplay(variant);
+            } else {
+              this.log('Variant data not found in response');
+            }
+          })
+          .catch((error) => {
+            this.log('Error fetching variant data', error);
+          });
+      }
+
+      getSectionId() {
+        const mainProduct = document.querySelector('[data-section-type="product"]');
+        if (mainProduct) {
+          return mainProduct.dataset.sectionId || mainProduct.id;
+        }
+        return 'main-product';
+      }
+
+      updatePriceDisplay(variant) {
+        this.log('Updating price display', variant);
+
+        const priceElements = document.querySelectorAll(this.priceSelector);
+        const comparePriceElements = document.querySelectorAll(this.comparePriceSelector);
+        const unitPriceElements = document.querySelectorAll(this.unitPriceSelector);
+        const availabilityElements = document.querySelectorAll(this.availabilitySelector);
+
+        if (!variant) {
+          this.log('No variant provided');
+          return;
+        }
+
+        if (priceElements.length > 0) {
+          const formattedPrice = this.formatMoney(variant.price);
+          priceElements.forEach((el) => {
+            el.textContent = formattedPrice;
+            this.log('Updated price element', { element: el, price: formattedPrice });
+          });
+        }
+
+        if (comparePriceElements.length > 0) {
+          if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+            const formattedComparePrice = this.formatMoney(variant.compare_at_price);
+            comparePriceElements.forEach((el) => {
+              el.textContent = formattedComparePrice;
+              el.style.display = '';
+              this.log('Updated compare price element', { element: el, price: formattedComparePrice });
+            });
+          } else {
+            comparePriceElements.forEach((el) => {
+              el.style.display = 'none';
+              this.log('Hidden compare price element', { element: el });
+            });
+          }
+        }
+
+        if (unitPriceElements.length > 0) {
+          if (variant.unit_price) {
+            const formattedUnitPrice = this.formatMoney(variant.unit_price);
+            const unitPriceBase = variant.unit_price_measurement ? 
+              `${formattedUnitPrice} / ${variant.unit_price_measurement.reference_value}${variant.unit_price_measurement.reference_unit}` : 
+              formattedUnitPrice;
+            
+            unitPriceElements.forEach((el) => {
+              el.textContent = unitPriceBase;
+              el.style.display = '';
+              this.log('Updated unit price element', { element: el, price: unitPriceBase });
+            });
+          } else {
+            unitPriceElements.forEach((el) => {
+              el.style.display = 'none';
+              this.log('Hidden unit price element', { element: el });
+            });
+          }
+        }
+
+        if (availabilityElements.length > 0) {
+          availabilityElements.forEach((el) => {
+            if (!variant.available) {
+              el.textContent = this.soldOutText;
+              el.style.display = '';
+              this.log('Updated availability to sold out', { element: el });
+            } else {
+              el.style.display = 'none';
+              this.log('Hidden availability element', { element: el });
+            }
+          });
+        }
+      }
+
+      formatMoney(cents) {
+        if (typeof cents === 'string') {
+          cents = parseInt(cents, 10);
+        }
+
+        const moneyFormat = this.getMoneyFormat();
+        const value = (cents / 100.0).toFixed(2);
+        
+        return moneyFormat
+          .replace('{{amount}}', value)
+          .replace('{{amount_no_decimals}}', Math.floor(cents / 100))
+          .replace('{{amount_with_comma_separator}}', value.replace('.', ','));
+      }
+
+      getMoneyFormat() {
+        if (window.Shopify && window.Shopify.money_format) {
+          return window.Shopify.money_format;
+        }
+        
+        if (window.theme && window.theme.moneyFormat) {
+          return window.theme.moneyFormat;
+        }
+
+        const metaTag = document.querySelector('meta[name="shopify-money-format"]');
+        if (metaTag) {
+          return metaTag.content;
+        }
+
+        return '${{amount}}';
+      }
+    }
+
+    customElements.define('variant-price-updater-{{ ai_gen_id }}', VariantPriceUpdater{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Variant price updater",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Price element selectors"
+    },
+    {
+      "type": "paragraph",
+      "content": "Enter CSS selectors for the price elements in your theme. Use class selectors (e.g., .price) or ID selectors (e.g., #product-price)."
+    },
+    {
+      "type": "text",
+      "id": "price_selector",
+      "label": "Price selector",
+      "default": ".price"
+    },
+    {
+      "type": "text",
+      "id": "compare_price_selector",
+      "label": "Compare at price selector",
+      "default": ".price--compare"
+    },
+    {
+      "type": "text",
+      "id": "unit_price_selector",
+      "label": "Unit price selector",
+      "default": ".unit-price"
+    },
+    {
+      "type": "text",
+      "id": "availability_selector",
+      "label": "Availability selector",
+      "default": ".product-availability"
+    },
+    {
+      "type": "header",
+      "content": "Availability text"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "Sold out text",
+      "default": "Sold out"
+    },
+    {
+      "type": "text",
+      "id": "unavailable_text",
+      "label": "Unavailable text",
+      "default": "Unavailable"
+    },
+    {
+      "type": "header",
+      "content": "Developer options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_logging",
+      "label": "Enable console logging",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Variant price updater"
+    }
+  ]
+}
+{% endschema %}

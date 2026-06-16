@@ -1,0 +1,10 @@
+<div class="buy-buttons">
+  <button class="btn btn-primary" type="submit" name="add" data-add-to-cart>
+    {%- if product.selected_or_first_available_variant.available -%}
+      Add to cart
+    {%- else -%}
+      Sold out
+    {%- endif -%}
+  </button>
+  {{ form | payment_button }}
+</div>

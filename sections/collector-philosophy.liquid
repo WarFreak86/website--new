@@ -1,0 +1,472 @@
+<section
+  id="CollectorPhilosophy-{{ section.id }}"
+  class="collector-philosophy cinematic-section"
+  style="
+    --cp-padding-top: {{ section.settings.padding_top }}px;
+    --cp-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --cp-shell-max-width: {{ section.settings.shell_max_width }}rem;
+    --cp-content-max-width: {{ section.settings.content_max_width }}ch;
+    --cp-media-min-height: {{ section.settings.image_min_height }}px;
+    --cp-heading-size-min: {{ section.settings.heading_size_mobile }}px;
+    --cp-heading-size-max: {{ section.settings.heading_size_desktop }}px;
+    --cp-body-size: {{ section.settings.body_size }}px;
+    --cp-eyebrow-color: {{ section.settings.eyebrow_color }};
+    --cp-heading-color: {{ section.settings.heading_color }};
+    --cp-body-color: {{ section.settings.body_color }};
+    --cp-shell-border: {{ section.settings.border_color }};
+    --cp-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --cp-bg-custom: {{ section.settings.custom_background }};
+  "
+>
+  <div class="collector-philosophy__shell page-width collector-philosophy__shell--{{ section.settings.background_style }} collector-philosophy__shell--image-{{ section.settings.image_position }} collector-philosophy__shell--{{ section.settings.layout_style }}{% if section.settings.enable_overlay %} collector-philosophy__shell--with-overlay{% endif %} reveal-fade-up" data-reveal="deep">
+    <div class="collector-philosophy__media-wrap reveal-fade-up reveal-delay-1" data-reveal="subtle">
+      {%- if section.settings.image != blank -%}
+        <div class="collector-philosophy__media">
+          {{
+            section.settings.image
+            | image_url: width: 2000
+            | image_tag:
+              class: 'collector-philosophy__image',
+              loading: 'lazy',
+              widths: '480, 720, 960, 1280, 1600, 2000',
+              sizes: '(min-width: 990px) 48vw, 100vw',
+              alt: section.settings.heading
+          }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="collector-philosophy__content-wrap reveal-fade-up reveal-delay-2" data-reveal>
+      <div class="collector-philosophy__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="collector-philosophy__eyebrow label-kicker reveal-fade-up reveal-delay-1" data-reveal="subtle">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          <h2 class="collector-philosophy__heading reveal-fade-up reveal-delay-2" data-reveal>{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <div class="collector-philosophy__body rte reveal-fade-up reveal-delay-3" data-reveal="subtle">{{ section.settings.body }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
+          <p class="collector-philosophy__actions reveal-fade-up reveal-delay-4" data-reveal="subtle">
+            <a
+              class="btn-premium collector-philosophy__cta"
+              href="{{ section.settings.cta_link }}"
+              aria-label="{{ section.settings.cta_label | escape }}"
+            >
+              {{ section.settings.cta_label | escape }}
+            </a>
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if section.settings.enable_grain -%}
+      <div class="collector-philosophy__grain" aria-hidden="true"></div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #CollectorPhilosophy-{{ section.id }} {
+    padding-top: var(--cp-padding-top);
+    padding-bottom: var(--cp-padding-bottom);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell {
+    position: relative;
+    display: grid;
+    gap: clamp(1.2rem, 3vw, 3rem);
+    align-items: stretch;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid var(--cp-shell-border, var(--ds-color-border, #2A2B2F));
+    border-radius: var(--ds-radius-lg, 0.4rem);
+    max-width: min(100%, var(--cp-shell-max-width));
+    margin-inline: auto;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--split {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--feature {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--balanced {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--image-right .collector-philosophy__media-wrap {
+    order: 2;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--image-right .collector-philosophy__content-wrap {
+    order: 1;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--surface {
+    background: linear-gradient(180deg, var(--ds-color-surface-1, #17181B) 0%, var(--ds-color-surface-0, #101113) 100%);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--atmospheric {
+    background:
+      radial-gradient(circle at 8% 12%, color-mix(in srgb, var(--ds-color-accent, #C6FF3D) 14%, transparent) 0%, transparent 38%),
+      linear-gradient(165deg, var(--ds-color-surface-1, #17181B) 0%, var(--ds-color-surface-0, #101113) 58%, var(--ds-color-bg, #050505) 100%);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--mono {
+    background: linear-gradient(180deg, var(--ds-color-surface-0, #101113) 0%, var(--ds-color-bg, #050505) 100%);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--custom {
+    background: var(--cp-bg-custom, var(--ds-color-surface-0, #101113));
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--with-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(5, 5, 5, calc(var(--cp-overlay-opacity) * 0.45)) 0%, rgba(5, 5, 5, var(--cp-overlay-opacity)) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__media-wrap,
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__content-wrap {
+    position: relative;
+    z-index: 2;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__media-wrap {
+    min-height: clamp(18rem, 42vw, var(--cp-media-min-height));
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__media {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(5, 5, 5, 0.06) 0%, rgba(5, 5, 5, 0.5) 100%);
+    pointer-events: none;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__content-wrap {
+    display: grid;
+    align-items: center;
+    padding: clamp(1.3rem, 3vw, 3rem) clamp(1rem, 3vw, 2.8rem) clamp(1.3rem, 3vw, 2.8rem);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__content {
+    max-width: var(--cp-content-max-width);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__eyebrow {
+    margin: 0 0 0.9rem;
+    color: var(--cp-eyebrow-color, var(--ds-color-text-muted, #A7A29A));
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__heading {
+    margin: 0;
+    font-family: var(--ds-font-heading, var(--font-heading));
+    font-size: clamp(var(--cp-heading-size-min), 5.3vw, var(--cp-heading-size-max));
+    line-height: 0.93;
+    letter-spacing: -0.022em;
+    text-transform: uppercase;
+    color: var(--cp-heading-color, var(--ds-color-text-strong, #F4EFE6));
+    text-wrap: balance;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__body {
+    margin-top: 1rem;
+    max-width: 40ch;
+    color: var(--cp-body-color, var(--ds-color-text, #F4EFE6));
+    font-family: var(--ds-font-body, var(--font-body));
+    font-size: clamp(1rem, 1.6vw, calc(var(--cp-body-size) / 16));
+    line-height: 1.62;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__actions {
+    margin: 1.3rem 0 0;
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__cta {
+    border-color: var(--ds-color-accent, #C6FF3D);
+  }
+
+  #CollectorPhilosophy-{{ section.id }} .collector-philosophy__grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.09;
+    mix-blend-mode: soft-light;
+    background-image:
+      radial-gradient(rgba(255, 255, 255, 0.24) 0.6px, transparent 0.6px),
+      radial-gradient(rgba(255, 255, 255, 0.12) 0.6px, transparent 0.6px);
+    background-size: 3px 3px, 5px 5px;
+    background-position: 0 0, 1px 1px;
+  }
+
+  @media (max-width: 989px) {
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell,
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--split,
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--feature,
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--balanced {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--image-right .collector-philosophy__media-wrap,
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__shell--image-right .collector-philosophy__content-wrap {
+      order: initial;
+    }
+
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__media-wrap {
+      min-height: clamp(14rem, 58vw, 24rem);
+    }
+
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__content-wrap {
+      padding: 1.25rem 1rem 1.5rem;
+    }
+
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__heading {
+      font-size: clamp(1.55rem, 8.4vw, 2.8rem);
+    }
+
+    #CollectorPhilosophy-{{ section.id }} .collector-philosophy__body {
+      max-width: 100%;
+      font-size: 1rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Collector Philosophy",
+  "tag": "section",
+  "class": "section-collector-philosophy",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "THE RENDER-LAB PHILOSOPHY"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Digital relics for unquiet rooms."
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body text",
+      "default": "<p>Render-Lab creates collector-grade artwork inspired by gaming culture, street energy, cinematic chaos, synthetic futures, and digital decay.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Layout style",
+      "default": "split",
+      "options": [
+        { "value": "split", "label": "Editorial split" },
+        { "value": "feature", "label": "Feature media" },
+        { "value": "balanced", "label": "Balanced" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Explore The Lab"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "Background style",
+      "default": "atmospheric",
+      "options": [
+        { "value": "surface", "label": "Surface" },
+        { "value": "atmospheric", "label": "Atmospheric" },
+        { "value": "mono", "label": "Mono" },
+        { "value": "custom", "label": "Custom color" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "custom_background",
+      "label": "Custom background color",
+      "default": "#101113"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#A7A29A"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#2A2B2F"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "Enable dark overlay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "%"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_grain",
+      "label": "Enable atmospheric grain",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "shell_max_width",
+      "label": "Layout max width",
+      "min": 70,
+      "max": 120,
+      "step": 2,
+      "default": 92,
+      "unit": "rem"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content width",
+      "min": 28,
+      "max": 56,
+      "step": 1,
+      "default": 40,
+      "unit": "ch"
+    },
+    {
+      "type": "range",
+      "id": "image_min_height",
+      "label": "Image min height",
+      "min": 280,
+      "max": 760,
+      "step": 20,
+      "default": 540,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size (mobile)",
+      "min": 24,
+      "max": 56,
+      "step": 1,
+      "default": 26,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size (desktop)",
+      "min": 44,
+      "max": 96,
+      "step": 1,
+      "default": 74,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body size",
+      "min": 16,
+      "max": 24,
+      "step": 1,
+      "default": 19,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 180,
+      "step": 4,
+      "default": 72,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 180,
+      "step": 4,
+      "default": 72,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collector Philosophy"
+    }
+  ]
+}
+{% endschema %}

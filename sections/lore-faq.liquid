@@ -1,0 +1,53 @@
+<section id="LoreFaq-{{ section.id }}" class="section-shell" style="--lf-pt: {{ section.settings.padding_top }}px; --lf-pb: {{ section.settings.padding_bottom }}px; --lf-bg: {{ section.settings.background_color }}; --lf-text: {{ section.settings.text_color }}; --lf-muted: {{ section.settings.muted_text_color }}; --lf-border: {{ section.settings.border_color }};">
+  <div class="page-width">
+    <div class="lore-faq-wrap reveal-fade-up" data-reveal="deep">
+      {%- if section.settings.eyebrow != blank -%}<p class="label-kicker reveal-fade-up reveal-delay-1" data-reveal="subtle">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      <h2 class="section-title lore-faq__title reveal-fade-up reveal-delay-2" data-reveal>{{ section.settings.heading | escape }}</h2>
+      {%- for block in section.blocks -%}
+        <details class="value-card lore-faq__item reveal-fade-up" data-reveal {{ block.shopify_attributes }}>
+          <summary><strong>{{ block.settings.question | escape }}</strong></summary>
+          <div class="rte">{{ block.settings.answer }}</div>
+        </details>
+      {%- endfor -%}
+      {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}<p class="reveal-fade-up" data-reveal><a class="btn-premium" href="{{ section.settings.cta_link }}">{{ section.settings.cta_label | escape }}</a></p>{%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #LoreFaq-{{ section.id }} { padding-top: var(--lf-pt); padding-bottom: var(--lf-pb); background: var(--lf-bg, var(--ds-color-bg, #050505)); }
+  #LoreFaq-{{ section.id }} .lore-faq-wrap { border: 1px solid var(--lf-border, var(--ds-color-border, #2A2B2F)); border-radius: var(--ds-radius-lg, 0.4rem); padding: clamp(1rem, 2.8vw, 2rem); background: linear-gradient(180deg, var(--ds-color-surface-1, #17181B) 0%, var(--ds-color-surface-0, #101113) 100%); }
+  #LoreFaq-{{ section.id }} .lore-faq__title { text-align: left; color: var(--lf-text, var(--ds-color-text-strong, #F4EFE6)); }
+  #LoreFaq-{{ section.id }} .lore-faq__item summary { color: var(--lf-text, var(--ds-color-text-strong, #F4EFE6)); cursor: pointer; }
+  #LoreFaq-{{ section.id }} .lore-faq__item .rte { color: var(--lf-muted, var(--ds-color-text, #F4EFE6)); }
+</style>
+
+{% schema %}
+{
+  "name": "Lore FAQ",
+  "max_blocks": 16,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Support" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Collector FAQ" },
+    { "type": "text", "id": "cta_label", "label": "CTA label" },
+    { "type": "url", "id": "cta_link", "label": "CTA link" },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#050505" },
+    { "type": "color", "id": "text_color", "label": "Heading color", "default": "#F4EFE6" },
+    { "type": "color", "id": "muted_text_color", "label": "Body color", "default": "#A7A29A" },
+    { "type": "color", "id": "border_color", "label": "Border color", "default": "#2A2B2F" },
+    { "type": "range", "id": "padding_top", "label": "Top spacing", "min": 0, "max": 180, "step": 4, "default": 56, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 0, "max": 180, "step": 4, "default": 56, "unit": "px" }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "What defines an edition?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Each edition follows a defined release scope and archive record.</p>" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Lore FAQ" }]
+}
+{% endschema %}

@@ -1,0 +1,4 @@
+<section class="section-shell"><div class="page-width"><h1 class="section-title">Create account</h1>{% form 'create_customer' %}
+      {% if form.errors %}<div class='form-error'>{{ form.errors | default_errors }}</div>{% endif %}<label for="RegisterFirstName">First name</label><input id="RegisterFirstName" type="text" name="customer[first_name]"><label for="RegisterLastName">Last name</label><input id="RegisterLastName" type="text" name="customer[last_name]"><label for="RegisterEmail">Email</label><input id="RegisterEmail" type="email" name="customer[email]" required><label for="RegisterPassword">Password</label><input id="RegisterPassword" type="password" name="customer[password]" required><button class="btn btn-primary" type="submit">Create account</button>{% endform %}</div></section>
+{% schema %}{ "name": "Main register", "settings": [] }{% endschema %}
+

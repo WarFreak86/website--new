@@ -1,0 +1,72 @@
+<header class="site-header{% if section.settings.sticky_header %} is-sticky{% endif %}">
+  <div class="page-width site-header__row">
+    <a class="site-header__logo" href="{{ routes.root_url }}" style="max-width: {{ settings.logo_width }}px;">
+      {%- if settings.logo != blank -%}
+        {{ settings.logo | image_url: width: settings.logo_width | image_tag: alt: shop.name, loading: 'eager' }}
+      {%- else -%}
+        <strong>{{ shop.name }}</strong>
+      {%- endif -%}
+    </a>
+
+    {%- if section.settings.menu != blank -%}
+      <nav class="site-nav" aria-label="Primary">
+        {%- for link in section.settings.menu.links -%}
+          <a href="{{ link.url }}">{{ link.title | escape }}</a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    <div class="site-header__icons">
+      {%- if section.settings.show_search -%}
+        <a class="icon-btn" href="{{ routes.search_url }}" aria-label="Search">{% render 'search-icon' %}</a>
+      {%- endif -%}
+      {%- if section.settings.show_account -%}
+        <a class="icon-btn" href="{{ routes.account_url }}" aria-label="Account">{% render 'account-icon' %}</a>
+      {%- endif -%}
+      {%- if section.settings.show_cart -%}
+        <a class="icon-btn" href="{{ routes.cart_url }}" aria-label="Cart">{% render 'cart-icon' %}
+          <span class="visually-hidden">{{ cart.item_count }}</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "section",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Enable sticky header",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

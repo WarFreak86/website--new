@@ -1,0 +1,86 @@
+<section class="section-shell">
+  <div class="page-width">
+    {% render 'breadcrumbs' %}
+    {% if cart.item_count == 0 %}
+      <h1 class="section-title">Your collection cart is empty</h1>
+      <a class="btn btn-primary" href="{{ routes.all_products_collection_url }}">Explore The Archive</a>
+    {% else %}
+      <h1 class="section-title">Collection Cart</h1>
+      {%- if section.settings.enable_free_shipping_progress -%}
+        {%- assign threshold_in_cents = section.settings.free_shipping_threshold | times: 100 -%}
+        {%- assign progress_percent = cart.total_price | times: 100.0 | divided_by: threshold_in_cents -%}
+        {%- if progress_percent > 100 -%}{%- assign progress_percent = 100 -%}{%- endif -%}
+        <div class="cart-progress">
+          {%- if cart.total_price >= threshold_in_cents -%}
+            <p class="form-success">{{ section.settings.free_shipping_reached_text }}</p>
+          {%- else -%}
+            {%- assign remaining = threshold_in_cents | minus: cart.total_price -%}
+            <p>{{ section.settings.free_shipping_remaining_text }} <strong>{{ remaining | money }}</strong></p>
+          {%- endif -%}
+          <div class="cart-progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress_percent | round }}">
+            <span class="cart-progress__bar" style="width: {{ progress_percent }}%;"></span>
+          </div>
+        </div>
+      {%- endif -%}
+      <form action="{{ routes.cart_url }}" method="post">
+        {%- for item in cart.items -%}
+          <div class="value-card">
+            <div class="main-product__grid">
+              <div>{% render 'responsive-image', image: item.image, alt: item.product.title, width: 400 %}</div>
+              <div>
+                <a href="{{ item.url }}"><strong>{{ item.product.title }}</strong></a>
+                {% render 'price', product_or_variant: item.variant %}
+                <label for="Quantity-{{ item.key }}">Quantity</label>
+                <input id="Quantity-{{ item.key }}" type="number" name="updates[]" value="{{ item.quantity }}" min="0">
+                <a href="{{ item.url_to_remove }}" aria-label="Remove {{ item.product.title | escape }} from cart">Remove Work</a>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+        <p><strong>Collector Subtotal:</strong> {{ cart.total_price | money }}</p>
+        <p class="cart-note">{{ section.settings.checkout_note }}</p>
+        <div class="cart-actions">
+          <button class="btn btn-secondary" type="submit" name="update">Update cart</button>
+          <button class="btn btn-primary" type="submit" name="checkout">{{ section.settings.checkout_label | escape }}</button>
+          <a class="btn btn-secondary" href="{{ routes.all_products_collection_url }}">{{ section.settings.continue_label | escape }}</a>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .cart-note {
+    margin: 0.5rem 0 0.85rem;
+    color: var(--ds-color-text-muted, #A7A29A);
+    font-size: 0.9rem;
+  }
+
+  #shopify-section-{{ section.id }} .cart-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 749px) {
+    #shopify-section-{{ section.id }} .cart-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Main cart",
+  "settings": [
+    { "type": "checkbox", "id": "enable_free_shipping_progress", "label": "Enable free shipping progress", "default": true },
+    { "type": "range", "id": "free_shipping_threshold", "label": "Free shipping threshold", "min": 25, "max": 300, "step": 5, "default": 75, "unit": "$" },
+    { "type": "text", "id": "free_shipping_remaining_text", "label": "Remaining text", "default": "You are away from free shipping by" },
+    { "type": "text", "id": "free_shipping_reached_text", "label": "Reached text", "default": "You unlocked free shipping." },
+    { "type": "text", "id": "checkout_label", "label": "Checkout button label", "default": "Secure Checkout" },
+    { "type": "text", "id": "continue_label", "label": "Continue shopping label", "default": "Continue Browsing" },
+    { "type": "text", "id": "checkout_note", "label": "Checkout support note", "default": "Shipping rates and delivery windows are shown at checkout before payment." }
+  ]
+}
+{% endschema %}

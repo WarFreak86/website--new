@@ -1,0 +1,80 @@
+<footer class="site-footer">
+  <div class="page-width footer-grid">
+    <div>
+      <h2>{{ section.settings.heading | escape }}</h2>
+      <div class="rte">{{ section.settings.text }}</div>
+      <a class="btn btn-primary" href="{{ routes.account_register_url }}">Create Collector Account</a>
+    </div>
+    <div>
+      <h3>Shop</h3>
+      <ul class="footer-nav">
+        {%- assign footer_menu = section.settings.footer_menu | default: linklists['footer'] -%}
+        {%- for link in footer_menu.links -%}
+          <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+    <div>
+      <h3>Help</h3>
+      <ul class="footer-nav">
+        <li><a href="{{ routes.search_url }}">Archive Search</a></li>
+        <li><a href="{{ routes.cart_url }}">Collection Cart</a></li>
+        <li><a href="{{ routes.account_url }}">Collector Account</a></li>
+      </ul>
+      {%- if section.settings.show_social -%}
+        <p>
+          {%- if settings.social_instagram_link != blank -%}<a href="{{ settings.social_instagram_link }}" rel="noopener">Instagram</a> {%- endif -%}
+          {%- if settings.social_tiktok_link != blank -%}<a href="{{ settings.social_tiktok_link }}" rel="noopener">TikTok</a> {%- endif -%}
+          {%- if settings.social_youtube_link != blank -%}<a href="{{ settings.social_youtube_link }}" rel="noopener">YouTube</a>{%- endif -%}
+        </p>
+      {%- endif -%}
+    </div>
+  </div>
+  <div class="page-width footer-bottom">
+    <small>
+      {%- if section.settings.copyright_text != blank -%}
+        {{ section.settings.copyright_text }}
+      {%- else -%}
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+      {%- endif -%}
+    </small>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "tag": "section",
+  "class": "section-footer",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "footer_menu",
+      "label": "Footer menu"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Stay in the loop"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Get first access to drops, promos, and limited runs.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text"
+    }
+  ]
+}
+{% endschema %}

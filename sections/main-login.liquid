@@ -1,0 +1,4 @@
+<section class="section-shell"><div class="page-width"><h1 class="section-title">Login</h1>{% form 'customer_login' %}
+      {% if form.errors %}<div class='form-error'>{{ form.errors | default_errors }}</div>{% endif %}<label for="CustomerEmail">Email</label><input id="CustomerEmail" type="email" name="customer[email]" required><label for="CustomerPassword">Password</label><input id="CustomerPassword" type="password" name="customer[password]" required><button class="btn btn-primary" type="submit">Sign in</button>{% endform %}<p><a href="{{ routes.account_register_url }}">Create account</a></p><p><a href="{{ routes.account_recover_url }}">Forgot password?</a></p></div></section>
+{% schema %}{ "name": "Main login", "settings": [] }{% endschema %}
+

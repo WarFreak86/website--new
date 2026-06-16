@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "hero": { "type": "lore-page-hero", "settings": { "eyebrow": "Craft", "heading": "Print Process", "text": "<p>Collector-grade standards from source curation to final dispatch.</p>" } },
+    "process": {
+      "type": "lore-process-steps",
+      "settings": { "eyebrow": "Production Flow", "heading": "From Curation To Packaging", "intro": "<p>Every edition follows a controlled process designed for visual impact and long-term display confidence.</p>" },
+      "blocks": {
+        "p1": {"type":"step","settings":{"heading":"Source Selection","text":"<p>Visual references are selected for tone, texture, and narrative pressure.</p>"}},
+        "p2": {"type":"step","settings":{"heading":"Color Calibration","text":"<p>Digital and physical output are matched to preserve contrast and shadow detail.</p>"}},
+        "p3": {"type":"step","settings":{"heading":"Collector Packaging","text":"<p>Finished works are sealed and reinforced for safe transit and clean arrival.</p>"}}
+      },
+      "block_order": ["p1","p2","p3"]
+    },
+    "split": { "type": "lore-editorial-split", "settings": { "eyebrow": "Material", "heading": "Collector-Grade Execution", "text": "<p>Every format is chosen for clarity, depth, and display longevity.</p>", "cta_label": "Compare Materials", "cta_link": "/pages/editions" } }
+  },
+  "order": ["hero", "process", "split"]
+}

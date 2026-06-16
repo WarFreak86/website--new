@@ -1,0 +1,7 @@
+{%- if template.name != 'index' -%}
+  <nav aria-label="Breadcrumb" class="breadcrumbs page-width">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span>/</span>
+    <span>{{ page_title }}</span>
+  </nav>
+{%- endif -%}

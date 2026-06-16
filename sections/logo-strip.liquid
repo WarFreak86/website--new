@@ -1,0 +1,31 @@
+<section class="section-shell">
+  <div class="page-width logo-strip">
+    {%- for block in section.blocks -%}
+      <div class="logo-pill" {{ block.shopify_attributes }}>
+        {%- if block.settings.logo != blank -%}
+          {{ block.settings.logo | image_url: width: 240 | image_tag: alt: block.settings.label, loading: 'lazy' }}
+        {%- else -%}
+          {{ block.settings.label | escape }}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Logo strip",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "logo", "label": "Logo" },
+        { "type": "text", "id": "label", "label": "Fallback label", "default": "Brand" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Logo strip" }]
+}
+{% endschema %}

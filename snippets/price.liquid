@@ -1,0 +1,12 @@
+{%- liquid
+  assign compare_at_price = product_or_variant.compare_at_price
+  assign price = product_or_variant.price
+-%}
+<div class="price" data-price-root>
+  {%- if compare_at_price > price -%}
+    <span class="price__sale" data-price-current>{{ price | money }}</span>
+    <s class="price__compare" data-price-compare>{{ compare_at_price | money }}</s>
+  {%- else -%}
+    <span class="price__regular" data-price-current>{{ price | money }}</span>
+  {%- endif -%}
+</div>

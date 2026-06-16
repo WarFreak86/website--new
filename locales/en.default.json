@@ -1,0 +1,10 @@
+{
+  "accessibility": {
+    "skip_to_text": "Skip to content"
+  },
+  "general": {
+    "search": {
+      "placeholder": "Search posters"
+    }
+  }
+}

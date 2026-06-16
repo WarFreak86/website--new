@@ -1,0 +1,666 @@
+{% doc %}
+  @prompt
+    Create a custom Artist Profile page section with a dark, gallery-inspired aesthetic that matches a premium art store. The section should include: a full-width or large artist portrait/photo image, the artist's name as a bold headline, a short tagline or medium/style descriptor, and a multi-line biography/description text block. Design should feel editorial and high-end — dark background, high contrast typography, minimal layout with generous whitespace. Optional: a "View Collection" button that links to the artist's collection. The layout should work as a standalone page section that can be reused for multiple artists.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-artist-profile-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding_top }}px 0 {{ block.settings.section_padding_bottom }}px;
+  }
+
+  .ai-artist-profile__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 {{ block.settings.horizontal_padding }}px;
+  }
+
+  .ai-artist-profile__layout-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: {{ block.settings.content_gap }}px;
+    align-items: start;
+  }
+
+  @media (min-width: 750px) {
+    .ai-artist-profile__layout-{{ ai_gen_id }} {
+      {% if block.settings.layout == 'side-by-side' %}
+        grid-template-columns: {{ block.settings.image_width }}% 1fr;
+      {% endif %}
+    }
+  }
+
+  .ai-artist-profile__image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    background-color: {{ block.settings.image_background }};
+  }
+
+  .ai-artist-profile__image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    {% if block.settings.image_aspect_ratio != 'natural' %}
+      aspect-ratio: {{ block.settings.image_aspect_ratio }};
+    {% endif %}
+  }
+
+  .ai-artist-profile__image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    background-color: {{ block.settings.image_background }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    {% if block.settings.image_aspect_ratio != 'natural' %}
+      aspect-ratio: {{ block.settings.image_aspect_ratio }};
+    {% else %}
+      min-height: 400px;
+    {% endif %}
+  }
+
+  .ai-artist-profile__image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    max-height: 500px;
+    opacity: 0.3;
+  }
+
+  .ai-artist-profile__empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: {{ block.settings.muted_text_color }};
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-artist-profile__content-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.text_spacing }}px;
+    {% if block.settings.layout == 'side-by-side' %}
+      padding-top: {{ block.settings.content_vertical_align }}px;
+    {% endif %}
+  }
+
+  .ai-artist-profile__name-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-weight: {{ block.settings.heading_font.weight }};
+    font-size: {{ block.settings.name_size }}px;
+    line-height: 1.1;
+    color: {{ block.settings.heading_color }};
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .ai-artist-profile__tagline-{{ ai_gen_id }} {
+    font-size: {{ block.settings.tagline_size }}px;
+    line-height: 1.4;
+    color: {{ block.settings.tagline_color }};
+    margin: 0;
+    font-weight: 500;
+    text-transform: {{ block.settings.tagline_transform }};
+    letter-spacing: 0.02em;
+  }
+
+  .ai-artist-profile__bio-{{ ai_gen_id }} {
+    font-size: {{ block.settings.bio_size }}px;
+    line-height: 1.6;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    max-width: {{ block.settings.bio_max_width }}ch;
+  }
+
+  .ai-artist-profile__bio-{{ ai_gen_id }} p {
+    margin: 0 0 1em;
+  }
+
+  .ai-artist-profile__bio-{{ ai_gen_id }} p:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-artist-profile__button-wrapper-{{ ai_gen_id }} {
+    margin-top: {{ block.settings.button_spacing }}px;
+  }
+
+  .ai-artist-profile__button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: {{ block.settings.button_border_width }}px solid {{ block.settings.button_border_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .ai-artist-profile__button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_border_color }};
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 749px) {
+    .ai-artist-profile__name-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.name_size }}px * 0.7);
+    }
+
+    .ai-artist-profile__tagline-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.tagline_size }}px * 0.9);
+    }
+
+    .ai-artist-profile__bio-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.bio_size }}px * 0.95);
+    }
+  }
+{% endstyle %}
+
+<artist-profile-{{ ai_gen_id }}
+  class="ai-artist-profile-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-artist-profile__container-{{ ai_gen_id }}">
+    <div class="ai-artist-profile__layout-{{ ai_gen_id }}">
+      <div class="ai-artist-profile__image-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.artist_image %}
+          <img
+            src="{{ block.settings.artist_image | image_url: width: 2000 }}"
+            alt="{{ block.settings.artist_image.alt | default: block.settings.artist_name | escape }}"
+            loading="lazy"
+            width="{{ block.settings.artist_image.width }}"
+            height="{{ block.settings.artist_image.height }}"
+            class="ai-artist-profile__image-{{ ai_gen_id }}"
+          >
+        {% else %}
+          <div class="ai-artist-profile__image-placeholder-{{ ai_gen_id }}">
+            {{ 'image' | placeholder_svg_tag }}
+            <div class="ai-artist-profile__empty-state-{{ ai_gen_id }}">
+              Add artist portrait
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ai-artist-profile__content-{{ ai_gen_id }}">
+        {% if block.settings.artist_name != blank %}
+          <h1 class="ai-artist-profile__name-{{ ai_gen_id }}">
+            {{ block.settings.artist_name }}
+          </h1>
+        {% endif %}
+
+        {% if block.settings.artist_tagline != blank %}
+          <p class="ai-artist-profile__tagline-{{ ai_gen_id }}">
+            {{ block.settings.artist_tagline }}
+          </p>
+        {% endif %}
+
+        {% if block.settings.artist_bio != blank %}
+          <div class="ai-artist-profile__bio-{{ ai_gen_id }}">
+            {{ block.settings.artist_bio }}
+          </div>
+        {% endif %}
+
+        {% if block.settings.show_button and block.settings.button_text != blank %}
+          <div class="ai-artist-profile__button-wrapper-{{ ai_gen_id }}">
+            <a
+              href="{{ block.settings.button_link }}"
+              class="ai-artist-profile__button-{{ ai_gen_id }}"
+            >
+              {{ block.settings.button_text }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</artist-profile-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ArtistProfile{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.init();
+      }
+
+      init() {
+        const button = this.querySelector('.ai-artist-profile__button-{{ ai_gen_id }}');
+        if (button) {
+          button.addEventListener('mouseenter', this.handleButtonHover.bind(this));
+          button.addEventListener('mouseleave', this.handleButtonLeave.bind(this));
+        }
+      }
+
+      handleButtonHover(event) {
+        event.currentTarget.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      }
+
+      handleButtonLeave(event) {
+        event.currentTarget.style.transition = 'all 0.3s ease';
+      }
+    }
+
+    customElements.define('artist-profile-{{ ai_gen_id }}', ArtistProfile{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Artist profile",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Artist information"
+    },
+    {
+      "type": "image_picker",
+      "id": "artist_image",
+      "label": "Artist portrait"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image aspect ratio",
+      "options": [
+        {
+          "value": "natural",
+          "label": "Natural"
+        },
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "16/9",
+          "label": "Widescreen (16:9)"
+        }
+      ],
+      "default": "3/4"
+    },
+    {
+      "type": "text",
+      "id": "artist_name",
+      "label": "Artist name",
+      "default": "Artist Name"
+    },
+    {
+      "type": "text",
+      "id": "artist_tagline",
+      "label": "Tagline"
+    },
+    {
+      "type": "richtext",
+      "id": "artist_bio",
+      "label": "Biography",
+      "default": "<p>Artist biography and description goes here. Share the artist's background, creative philosophy, and what makes their work unique.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout style",
+      "options": [
+        {
+          "value": "stacked",
+          "label": "Stacked"
+        },
+        {
+          "value": "side-by-side",
+          "label": "Side by side"
+        }
+      ],
+      "default": "side-by-side"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image width (side by side)",
+      "min": 30,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Maximum width",
+      "min": 800,
+      "max": 1680,
+      "step": 40,
+      "unit": "px",
+      "default": 1360
+    },
+    {
+      "type": "range",
+      "id": "horizontal_padding",
+      "label": "Horizontal padding",
+      "min": 16,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "content_gap",
+      "label": "Content gap",
+      "min": 24,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "content_vertical_align",
+      "label": "Content vertical offset",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "default": "space_grotesk_n7"
+    },
+    {
+      "type": "range",
+      "id": "name_size",
+      "label": "Name size",
+      "min": 32,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "tagline_size",
+      "label": "Tagline size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "tagline_transform",
+      "label": "Tagline style",
+      "options": [
+        {
+          "value": "none",
+          "label": "Normal"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "bio_size",
+      "label": "Bio size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "bio_max_width",
+      "label": "Bio max width",
+      "min": 40,
+      "max": 80,
+      "step": 5,
+      "unit": "ch",
+      "default": 65
+    },
+    {
+      "type": "range",
+      "id": "text_spacing",
+      "label": "Text spacing",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "Show button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "View Collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "range",
+      "id": "button_spacing",
+      "label": "Button top spacing",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Button vertical padding",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Button horizontal padding",
+      "min": 16,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Button font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Button border width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "tagline_color",
+      "label": "Tagline",
+      "default": "#C6FF3D"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Body text",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Muted text",
+      "default": "#A7A29A"
+    },
+    {
+      "type": "color",
+      "id": "image_background",
+      "label": "Image background",
+      "default": "#17181B"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Image border radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#C6FF3D"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border",
+      "default": "#C6FF3D"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Button hover background",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Button hover text",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_border_color",
+      "label": "Button hover border",
+      "default": "#F4EFE6"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Artist profile"
+    }
+  ]
+}
+{% endschema %}

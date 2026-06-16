@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "hero": { "type": "lore-page-hero", "settings": { "eyebrow": "Archive", "heading": "Archive", "text": "<p>A living record of releases, editions, and collector milestones.</p>" } },
+    "timeline": {
+      "type": "lore-timeline",
+      "settings": { "eyebrow": "Release History", "heading": "Release Timeline" },
+      "blocks": {
+        "entry_1": {"type":"entry","settings":{"label":"Release 01","heading":"Signal Origins","text":"<p>The opening archive drop established Render-Lab's cinematic street language.</p>"}},
+        "entry_2": {"type":"entry","settings":{"label":"Release 02","heading":"Edition Expansion","text":"<p>Material formats expanded with collector feedback and packaging upgrades.</p>"}},
+        "entry_3": {"type":"entry","settings":{"label":"Release 03","heading":"Archive Consolidation","text":"<p>Drop cadence and edition notes were formalized for long-term collector tracking.</p>"}}
+      },
+      "block_order": ["entry_1","entry_2","entry_3"]
+    }
+  },
+  "order": ["hero", "timeline"]
+}

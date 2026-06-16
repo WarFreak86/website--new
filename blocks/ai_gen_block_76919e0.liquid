@@ -1,0 +1,440 @@
+{% doc %}
+  @prompt
+    Create a button group section that displays multiple buttons side by side. It should support at least 2 buttons, each with a customizable label and link. The buttons should be styled to match the theme's existing button styles, be horizontally aligned, and be responsive (stacking vertically on mobile). Include settings for button style (primary/secondary) per button.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-button-group-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+  }
+
+  .ai-button-group__container-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.button_spacing }}px;
+    justify-content: {{ block.settings.alignment }};
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .ai-button-group__button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: {{ settings.radius_large }}px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    white-space: nowrap;
+  }
+
+  .ai-button-group__button--primary-{{ ai_gen_id }} {
+    background-color: {{ block.settings.primary_bg_color }};
+    color: {{ block.settings.primary_text_color }};
+    border-color: {{ block.settings.primary_bg_color }};
+  }
+
+  .ai-button-group__button--primary-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.primary_hover_bg_color }};
+    border-color: {{ block.settings.primary_hover_bg_color }};
+    color: {{ block.settings.primary_hover_text_color }};
+  }
+
+  .ai-button-group__button--secondary-{{ ai_gen_id }} {
+    background-color: {{ block.settings.secondary_bg_color }};
+    color: {{ block.settings.secondary_text_color }};
+    border-color: {{ block.settings.secondary_border_color }};
+  }
+
+  .ai-button-group__button--secondary-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.secondary_hover_bg_color }};
+    border-color: {{ block.settings.secondary_hover_border_color }};
+    color: {{ block.settings.secondary_hover_text_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-button-group__container-{{ ai_gen_id }} {
+      flex-direction: {{ block.settings.mobile_layout }};
+      gap: {{ block.settings.mobile_button_spacing }}px;
+    }
+
+    .ai-button-group__button-{{ ai_gen_id }} {
+      {% if block.settings.mobile_layout == 'column' %}
+        width: 100%;
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<button-group-{{ ai_gen_id }}
+  class="ai-button-group-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-button-group__container-{{ ai_gen_id }}">
+    {% if block.settings.button_1_label != blank %}
+      <a
+        href="{{ block.settings.button_1_link }}"
+        class="ai-button-group__button-{{ ai_gen_id }} ai-button-group__button--{{ block.settings.button_1_style }}-{{ ai_gen_id }}"
+      >
+        {{ block.settings.button_1_label }}
+      </a>
+    {% endif %}
+
+    {% if block.settings.button_2_label != blank %}
+      <a
+        href="{{ block.settings.button_2_link }}"
+        class="ai-button-group__button-{{ ai_gen_id }} ai-button-group__button--{{ block.settings.button_2_style }}-{{ ai_gen_id }}"
+      >
+        {{ block.settings.button_2_label }}
+      </a>
+    {% endif %}
+
+    {% if block.settings.button_3_label != blank %}
+      <a
+        href="{{ block.settings.button_3_link }}"
+        class="ai-button-group__button-{{ ai_gen_id }} ai-button-group__button--{{ block.settings.button_3_style }}-{{ ai_gen_id }}"
+      >
+        {{ block.settings.button_3_label }}
+      </a>
+    {% endif %}
+
+    {% if block.settings.button_4_label != blank %}
+      <a
+        href="{{ block.settings.button_4_link }}"
+        class="ai-button-group__button-{{ ai_gen_id }} ai-button-group__button--{{ block.settings.button_4_style }}-{{ ai_gen_id }}"
+      >
+        {{ block.settings.button_4_label }}
+      </a>
+    {% endif %}
+  </div>
+</button-group-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ButtonGroup{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.buttons = this.querySelectorAll('.ai-button-group__button-{{ ai_gen_id }}');
+      }
+    }
+
+    customElements.define('button-group-{{ ai_gen_id }}', ButtonGroup{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Button group",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "button_spacing",
+      "label": "Button spacing",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        {
+          "value": "row",
+          "label": "Horizontal"
+        },
+        {
+          "value": "column",
+          "label": "Stacked"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_spacing",
+      "label": "Mobile button spacing",
+      "min": 8,
+      "max": 24,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Button 1"
+    },
+    {
+      "type": "text",
+      "id": "button_1_label",
+      "label": "Label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "button_1_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "header",
+      "content": "Button 2"
+    },
+    {
+      "type": "text",
+      "id": "button_2_label",
+      "label": "Label",
+      "default": "Learn more"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "button_2_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "secondary"
+    },
+    {
+      "type": "header",
+      "content": "Button 3"
+    },
+    {
+      "type": "text",
+      "id": "button_3_label",
+      "label": "Label"
+    },
+    {
+      "type": "url",
+      "id": "button_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "button_3_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "header",
+      "content": "Button 4"
+    },
+    {
+      "type": "text",
+      "id": "button_4_label",
+      "label": "Label"
+    },
+    {
+      "type": "url",
+      "id": "button_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "button_4_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "secondary"
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Vertical padding",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 16,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Primary button colors"
+    },
+    {
+      "type": "color",
+      "id": "primary_bg_color",
+      "label": "Background",
+      "default": "#C6FF3D"
+    },
+    {
+      "type": "color",
+      "id": "primary_text_color",
+      "label": "Text",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "primary_hover_bg_color",
+      "label": "Hover background",
+      "default": "#B3E835"
+    },
+    {
+      "type": "color",
+      "id": "primary_hover_text_color",
+      "label": "Hover text",
+      "default": "#050505"
+    },
+    {
+      "type": "header",
+      "content": "Secondary button colors"
+    },
+    {
+      "type": "color",
+      "id": "secondary_bg_color",
+      "label": "Background",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "secondary_text_color",
+      "label": "Text",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "secondary_border_color",
+      "label": "Border",
+      "default": "#2A2B2F"
+    },
+    {
+      "type": "color",
+      "id": "secondary_hover_bg_color",
+      "label": "Hover background",
+      "default": "#17181B"
+    },
+    {
+      "type": "color",
+      "id": "secondary_hover_text_color",
+      "label": "Hover text",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "secondary_hover_border_color",
+      "label": "Hover border",
+      "default": "#C6FF3D"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Button group"
+    }
+  ]
+}
+{% endschema %}

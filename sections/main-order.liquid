@@ -1,0 +1,2 @@
+<section class="section-shell"><div class="page-width"><h1 class="section-title">Order {{ order.name }}</h1><p>{{ order.created_at | date: "%B %d, %Y" }}</p>{% for line_item in order.line_items %}<div class="value-card">{{ line_item.title }} x {{ line_item.quantity }} - {{ line_item.final_line_price | money }}</div>{% endfor %}<p><strong>Total:</strong> {{ order.total_price | money }}</p></div></section>
+{% schema %}{ "name": "Main order", "settings": [] }{% endschema %}

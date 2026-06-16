@@ -1,0 +1,30 @@
+<section class="section-shell">
+  <div class="page-width">
+    <h2 class="section-title">{{ section.settings.heading | escape }}</h2>
+    {%- if section.settings.product != blank -%}
+      {%- assign featured_product = section.settings.product -%}
+      <div class="main-product__grid">
+        <div>{% render 'responsive-image', image: featured_product.featured_image, alt: featured_product.title, width: 1200 %}</div>
+        <div>
+          <h3>{{ featured_product.title }}</h3>
+          {% render 'price', product_or_variant: featured_product.selected_or_first_available_variant %}
+          {{ featured_product.description | strip_html | truncate: 220 }}
+          <p><a class="btn btn-primary" href="{{ featured_product.url }}">View product</a></p>
+        </div>
+      </div>
+    {%- else -%}
+      <p>Select a product in the section settings.</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured product",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Featured product" },
+    { "type": "product", "id": "product", "label": "Product" }
+  ],
+  "presets": [{ "name": "Featured product" }]
+}
+{% endschema %}

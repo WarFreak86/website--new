@@ -1,0 +1,50 @@
+<section id="ShippingPackaging-{{ section.id }}" class="section-shell" style="--sp-pt: {{ section.settings.padding_top }}px; --sp-pb: {{ section.settings.padding_bottom }}px; --sp-bg: {{ section.settings.background_color }}; --sp-text: {{ section.settings.text_color }}; --sp-muted: {{ section.settings.muted_text_color }}; --sp-border: {{ section.settings.border_color }};">
+  <div class="page-width shipping-packaging shipping-packaging--{{ section.settings.image_position }} reveal-fade-up" data-reveal="deep">
+    <div class="shipping-packaging__media image-hover-scale image-hover-scale--soft reveal-fade-up reveal-delay-1" data-reveal="subtle">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '720, 960, 1280, 1600, 1800', sizes: '(min-width: 990px) 44vw, 100vw', alt: section.settings.heading }}
+      {%- endif -%}
+    </div>
+    <div class="shipping-packaging__content reveal-fade-up reveal-delay-2" data-reveal>
+      <p class="label-kicker">{{ section.settings.eyebrow | escape }}</p>
+      <h2 class="section-title shipping-packaging__title">{{ section.settings.heading | escape }}</h2>
+      <div class="rte shipping-packaging__text">{{ section.settings.text }}</div>
+      {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}<p class="shipping-packaging__actions"><a class="btn-premium" href="{{ section.settings.cta_link }}">{{ section.settings.cta_label | escape }}</a></p>{%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #ShippingPackaging-{{ section.id }} { padding-top: var(--sp-pt); padding-bottom: var(--sp-pb); background: var(--sp-bg, var(--ds-color-bg, #050505)); }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging--right .shipping-packaging__media { order: 2; }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging__media { border: 1px solid var(--sp-border, var(--ds-color-border, #2A2B2F)); border-radius: var(--ds-radius-md, 0.2rem); min-height: 18rem; background: var(--ds-color-surface-1, #17181B); overflow: hidden; }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging__media img { width: 100%; height: 100%; object-fit: cover; }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging__content { border: 1px solid var(--sp-border, var(--ds-color-border, #2A2B2F)); border-radius: var(--ds-radius-md, 0.2rem); padding: clamp(1rem, 2.6vw, 2rem); background: linear-gradient(180deg, var(--ds-color-surface-1, #17181B) 0%, var(--ds-color-surface-0, #101113) 100%); }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging__title { text-align: left; color: var(--sp-text, var(--ds-color-text-strong, #F4EFE6)); }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging__text { color: var(--sp-muted, var(--ds-color-text, #F4EFE6)); }
+  #ShippingPackaging-{{ section.id }} .shipping-packaging__actions { margin-top: 1rem; }
+  @media (max-width: 989px) { #ShippingPackaging-{{ section.id }} .shipping-packaging { grid-template-columns: 1fr; } #ShippingPackaging-{{ section.id }} .shipping-packaging--right .shipping-packaging__media { order: 0; } }
+</style>
+
+{% schema %}
+{
+  "name": "Shipping and packaging",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Dispatch Protocol" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shipping & Packaging" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Each order is packed for collector-grade protection and tracked from dispatch to delivery.</p>" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "select", "id": "image_position", "label": "Image position", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"right","label":"Right"}] },
+    { "type": "text", "id": "cta_label", "label": "CTA label" },
+    { "type": "url", "id": "cta_link", "label": "CTA link" },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#050505" },
+    { "type": "color", "id": "text_color", "label": "Heading color", "default": "#F4EFE6" },
+    { "type": "color", "id": "muted_text_color", "label": "Body color", "default": "#A7A29A" },
+    { "type": "color", "id": "border_color", "label": "Border color", "default": "#2A2B2F" },
+    { "type": "range", "id": "padding_top", "label": "Top spacing", "min": 0, "max": 180, "step": 4, "default": 56, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 0, "max": 180, "step": 4, "default": 56, "unit": "px" }
+  ],
+  "presets": [{ "name": "Shipping and packaging" }]
+}
+{% endschema %}

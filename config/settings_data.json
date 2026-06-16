@@ -1,0 +1,30 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "current": {
+    "logo_width": 180,
+    "base_font_size": 16,
+    "page_width": 1360,
+    "section_spacing": 64,
+    "radius_large": 14,
+    "color_background": "#050505",
+    "color_surface": "#17181B",
+    "color_text": "#F4EFE6",
+    "color_heading": "#F4EFE6",
+    "color_muted": "#A7A29A",
+    "color_border": "#2A2B2F",
+    "color_accent": "#C6FF3D",
+    "color_dark": "#101113",
+    "homepage_seo_title": "Render-Lab | Premium Canvas Prints, Metal Wall Art, and Collector Editions",
+    "homepage_seo_description": "Render-Lab creates premium canvas prints and metal wall art inspired by gaming culture, street signal, dark fantasy, and cinematic worlds for modern collectors.",
+    "default_seo_description": "Discover collector art prints, cinematic wall art, and limited editions from the Render-Lab archive.",
+    "social_twitter_handle": ""
+  }
+}

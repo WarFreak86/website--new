@@ -1,0 +1,9 @@
+<article class="product-card">
+  <a href="{{ product.url }}" class="product-card__media">
+    {% render 'responsive-image', image: product.featured_image, alt: product.title, width: 900 %}
+  </a>
+  <div class="product-card__content">
+    <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    {% render 'price', product_or_variant: product %}
+  </div>
+</article>

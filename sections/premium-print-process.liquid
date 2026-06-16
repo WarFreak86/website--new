@@ -1,0 +1,76 @@
+<section id="PremiumPrintProcess-{{ section.id }}" class="section-shell" style="--ppp-pt: {{ section.settings.padding_top }}px; --ppp-pb: {{ section.settings.padding_bottom }}px; --ppp-bg: {{ section.settings.background_color }}; --ppp-text: {{ section.settings.text_color }}; --ppp-muted: {{ section.settings.muted_text_color }}; --ppp-border: {{ section.settings.border_color }}; --ppp-accent: {{ section.settings.accent_color }};">
+  <div class="page-width">
+    <div class="conversion-print-process ambient-grain reveal-fade-up" data-reveal="deep">
+      {%- if section.settings.eyebrow != blank -%}<p class="label-kicker reveal-fade-up reveal-delay-1" data-reveal="subtle">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      <h2 class="section-title conversion-print-process__title reveal-fade-up reveal-delay-2" data-reveal>{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.intro != blank -%}<div class="rte conversion-print-process__intro reveal-fade-up reveal-delay-3" data-reveal="subtle">{{ section.settings.intro }}</div>{%- endif -%}
+
+      <div class="conversion-print-process__steps">
+        {%- for block in section.blocks -%}
+          <article class="conversion-print-process__step reveal-fade-up" data-reveal {{ block.shopify_attributes }}>
+            <p class="conversion-print-process__index">{{ forloop.index | prepend: '0' }}</p>
+            <h3>{{ block.settings.heading | escape }}</h3>
+            <div class="rte">{{ block.settings.text }}</div>
+            {%- if block.settings.image != blank -%}
+              <div class="conversion-print-process__image image-hover-scale image-hover-scale--soft">
+                {{ block.settings.image | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '320, 480, 720, 960, 1200, 1400', sizes: '(min-width: 990px) 30vw, 100vw', alt: block.settings.heading }}
+              </div>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
+        <p class="conversion-print-process__actions reveal-fade-up" data-reveal><a class="btn-premium" href="{{ section.settings.cta_link }}">{{ section.settings.cta_label | escape }}</a></p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #PremiumPrintProcess-{{ section.id }} { padding-top: var(--ppp-pt); padding-bottom: var(--ppp-pb); background: var(--ppp-bg, var(--ds-color-bg, #050505)); }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process { border: 1px solid var(--ppp-border, var(--ds-color-border, #2A2B2F)); border-radius: var(--ds-radius-lg, 0.4rem); padding: clamp(1rem, 2.8vw, 2rem); background: linear-gradient(180deg, var(--ds-color-surface-1, #17181B) 0%, var(--ds-color-surface-0, #101113) 100%); }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__title { text-align: left; margin-bottom: 0.8rem; color: var(--ppp-text, var(--ds-color-text-strong, #F4EFE6)); }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__intro { max-width: 58ch; margin-bottom: 1rem; color: var(--ppp-muted, var(--ds-color-text-muted, #A7A29A)); }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__step { border-top: 1px solid var(--ppp-border, var(--ds-color-border, #2A2B2F)); padding-top: 0.8rem; }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__index { margin: 0 0 0.35rem; font-family: var(--ds-font-heading, var(--font-heading)); color: var(--ppp-accent, var(--ds-color-accent, #C6FF3D)); letter-spacing: 0.08em; }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__step h3 { margin: 0 0 0.35rem; text-transform: uppercase; font-family: var(--ds-font-heading, var(--font-heading)); color: var(--ppp-text, var(--ds-color-text-strong, #F4EFE6)); }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__step .rte { color: var(--ppp-muted, var(--ds-color-text, #F4EFE6)); }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__image { margin-top: 0.75rem; border: 1px solid var(--ppp-border, var(--ds-color-border, #2A2B2F)); border-radius: var(--ds-radius-md, 0.2rem); overflow: hidden; }
+  #PremiumPrintProcess-{{ section.id }} .conversion-print-process__actions { margin: 1rem 0 0; }
+  @media (max-width: 989px) { #PremiumPrintProcess-{{ section.id }} .conversion-print-process__steps { grid-template-columns: 1fr; } }
+</style>
+
+{% schema %}
+{
+  "name": "Premium print process",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Craft Standard" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Premium Print Process" },
+    { "type": "richtext", "id": "intro", "label": "Intro text", "default": "<p>Collector-grade execution from source curation to final packaging.</p>" },
+    { "type": "text", "id": "cta_label", "label": "CTA label" },
+    { "type": "url", "id": "cta_link", "label": "CTA link" },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#050505" },
+    { "type": "color", "id": "text_color", "label": "Heading color", "default": "#F4EFE6" },
+    { "type": "color", "id": "muted_text_color", "label": "Body color", "default": "#A7A29A" },
+    { "type": "color", "id": "border_color", "label": "Border color", "default": "#2A2B2F" },
+    { "type": "color", "id": "accent_color", "label": "Step accent color", "default": "#C6FF3D" },
+    { "type": "range", "id": "padding_top", "label": "Top spacing", "min": 0, "max": 180, "step": 4, "default": 56, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 0, "max": 180, "step": 4, "default": 56, "unit": "px" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Process step",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Source Curation" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Every work is selected for visual impact, tension, and collector relevance.</p>" },
+        { "type": "image_picker", "id": "image", "label": "Optional image" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Premium print process" }]
+}
+{% endschema %}

@@ -1,0 +1,102 @@
+{%- if product.has_only_default_variant == false -%}
+  <div
+    class="variant-picker"
+    data-variant-picker
+    data-premium-options-enabled="{{ section.settings.enable_premium_option_cards }}"
+    data-premium-material-enabled="{{ section.settings.use_cards_for_material }}"
+    data-premium-size-enabled="{{ section.settings.use_cards_for_size }}"
+    data-premium-material-copy="{{ section.settings.show_material_helper_copy }}"
+  >
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign option_name_handle = option.name | handleize
+        assign option_name_downcase = option.name | downcase
+        assign is_material_option = false
+        assign is_size_option = false
+        assign use_option_cards = false
+
+        if option_name_downcase contains 'material' or option_name_downcase contains 'medium' or option_name_downcase contains 'finish' or option_name_downcase == 'type'
+          assign is_material_option = true
+        endif
+
+        if option_name_downcase contains 'size'
+          assign is_size_option = true
+        endif
+
+        if section.settings.enable_premium_option_cards
+          if is_material_option and section.settings.use_cards_for_material
+            assign use_option_cards = true
+          endif
+
+          if is_size_option and section.settings.use_cards_for_size and option.values.size <= section.settings.size_card_value_limit
+            assign use_option_cards = true
+          endif
+        endif
+      -%}
+
+      <fieldset
+        class="variant-picker__group{% if use_option_cards %} variant-picker__group--cards{% endif %}"
+        data-option-group
+        data-option-position="{{ option.position }}"
+        data-option-name="{{ option.name | escape }}"
+        data-option-card-type="{% if is_material_option %}material{% elsif is_size_option %}size{% else %}standard{% endif %}"
+      >
+        <legend class="variant-picker__legend">{{ option.name }}</legend>
+        <label class="variant-picker__select-label" for="Option-{{ section.id }}-{{ option.position }}">{{ option.name }}</label>
+        <select
+          id="Option-{{ section.id }}-{{ option.position }}"
+          name="options[{{ option.name | escape }}]"
+          data-option-position="{{ option.position }}"
+          {% if use_option_cards %}data-premium-option-source{% endif %}
+        >
+          {%- for value in option.values -%}
+            <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+          {%- endfor -%}
+        </select>
+
+        {%- if use_option_cards -%}
+          <div
+            class="premium-option-cards"
+            data-premium-option-cards
+            role="radiogroup"
+            aria-label="{{ option.name | escape }}"
+          >
+            {%- for value in option.values -%}
+              {%- liquid
+                assign value_downcase = value | downcase
+                assign helper_copy = ''
+
+                if section.settings.show_material_helper_copy and is_material_option
+                  if value_downcase contains 'canvas'
+                    assign helper_copy = 'Textured gallery wrap with warm depth and ready-to-hang presence.'
+                  elsif value_downcase contains 'metal'
+                    assign helper_copy = 'Sleek aluminum surface with sharp contrast and modern durability.'
+                  elsif value_downcase contains 'aluminum'
+                    assign helper_copy = 'Sleek aluminum surface with sharp contrast and modern durability.'
+                  elsif value_downcase contains 'poster' or value_downcase contains 'paper'
+                    assign helper_copy = 'Clean art print finish for flexible framing.'
+                  endif
+                endif
+              -%}
+              <button
+                type="button"
+                class="premium-option-card{% if option.selected_value == value %} is-selected{% endif %}"
+                role="radio"
+                aria-checked="{% if option.selected_value == value %}true{% else %}false{% endif %}"
+                data-premium-option-card
+                data-option-value="{{ value | escape }}"
+                tabindex="{% if option.selected_value == value %}0{% else %}-1{% endif %}"
+              >
+                <span class="premium-option-card__label">{{ value }}</span>
+                {%- if helper_copy != blank -%}
+                  <span class="premium-option-card__helper">{{ helper_copy }}</span>
+                {%- endif -%}
+                <span class="premium-option-card__state" data-option-state>Selected</span>
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </fieldset>
+    {%- endfor -%}
+  </div>
+{%- endif -%}

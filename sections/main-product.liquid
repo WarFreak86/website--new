@@ -1,0 +1,1391 @@
+<section class="section-shell">
+  <div class="page-width">
+    {% render 'breadcrumbs' %}
+
+    {%- liquid
+      assign product_media_ratio = 'auto'
+      case section.settings.media_box_ratio
+        when '16:9'
+          assign product_media_ratio = '16 / 9'
+        when '4:3'
+          assign product_media_ratio = '4 / 3'
+        when '3:2'
+          assign product_media_ratio = '3 / 2'
+        when '1:1'
+          assign product_media_ratio = '1 / 1'
+        when '2:3'
+          assign product_media_ratio = '2 / 3'
+        when '3:4'
+          assign product_media_ratio = '3 / 4'
+        when 'custom'
+          assign product_media_ratio = section.settings.custom_media_box_ratio_width | append: ' / ' | append: section.settings.custom_media_box_ratio_height
+      endcase
+
+      assign product_media_shadow = 'none'
+      if section.settings.media_box_enable_shadow
+        assign product_media_shadow = '0 28px 70px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+      endif
+
+      assign show_featured_description = false
+      if section.settings.show_featured_description and section.settings.product_description_position != 'original_location_only' and product.description != blank
+        assign show_featured_description = true
+      endif
+
+      assign show_original_description = false
+      if product.description != blank
+        if show_featured_description == false
+          assign show_original_description = true
+        elsif section.settings.hide_original_description_when_featured == false
+          assign show_original_description = true
+        endif
+      endif
+    -%}
+
+    {%- capture featured_description_markup -%}
+      {%- if show_featured_description -%}
+        <div
+          class="product-featured-description"
+          data-featured-description
+          style="--featured-description-max-height: {{ section.settings.featured_description_max_height }}px;"
+        >
+          {%- if section.settings.featured_description_heading != blank -%}
+            <p class="product-featured-description__heading">{{ section.settings.featured_description_heading | escape }}</p>
+          {%- endif -%}
+          <div
+            id="FeaturedDescription-{{ section.id }}"
+            class="rte product-featured-description__content"
+            data-featured-description-content
+          >
+            {{ product.description }}
+          </div>
+          <div class="product-featured-description__actions">
+            <button
+              type="button"
+              class="product-featured-description__toggle"
+              data-featured-description-toggle
+              aria-expanded="false"
+              aria-controls="FeaturedDescription-{{ section.id }}"
+            >
+              Read more
+            </button>
+            {%- unless section.settings.hide_original_description_when_featured -%}
+              <a class="product-featured-description__link" href="#ProductFullDescription-{{ section.id }}">View full details</a>
+            {%- endunless -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    <div
+      class="main-product__grid collector-product"
+      data-product-section="{{ section.id }}"
+      data-product-id="{{ product.id }}"
+      style="
+        --product-media-desktop-width: {{ section.settings.media_desktop_width }}%;
+        --product-media-ratio: {{ product_media_ratio }};
+        --product-media-fit: {{ section.settings.media_object_fit }};
+        --product-media-max-width: {{ section.settings.media_box_max_width }}px;
+        --product-media-max-height: {{ section.settings.media_box_max_height }}px;
+        --product-media-padding: {{ section.settings.media_box_padding }}px;
+        --product-media-border-width: {{ section.settings.media_box_border_width }}px;
+        --product-media-border-radius: {{ section.settings.media_box_border_radius }}px;
+        --product-media-border-opacity: {{ section.settings.media_box_border_opacity }}%;
+        --product-media-border-color: {{ section.settings.media_box_border_color }};
+        --product-media-background-opacity: {{ section.settings.media_box_background_opacity }}%;
+        --product-media-shadow: {{ product_media_shadow }};
+        --product-thumbnail-size: {{ section.settings.thumbnail_size }}px;
+        --product-thumbnail-gap: {{ section.settings.thumbnail_gap }}px;
+        --product-panel-bg: {{ section.settings.panel_background }};
+        --product-panel-text: {{ section.settings.panel_text_color }};
+        --product-panel-accent: {{ section.settings.panel_accent_color }};
+        --product-panel-spacing: {{ section.settings.panel_spacing }}px;
+        --product-button-style: {{ section.settings.button_style }};
+      "
+    >
+      <div class="main-product__media collector-product__media{% if section.settings.sticky_media_desktop %} collector-product__media--sticky{% endif %}{% if section.settings.thumbnail_position == 'left' %} collector-product__media--thumbs-left{% endif %}">
+        {%- if product.media.size > 0 -%}
+          {%- assign initial_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media | default: product.media.first -%}
+          <div class="main-product__featured-media collector-product__featured" data-featured-media-container>
+            {%- for media in product.media -%}
+              <div class="collector-product__featured-item{% if media.id == initial_media.id %} is-active{% endif %}" data-media-id="{{ media.id }}">
+                {%- case media.media_type -%}
+                  {%- when 'image' -%}
+                    {{ media | image_url: width: 1800 | image_tag: alt: media.alt | default: product.title, loading: 'eager', widths: '750, 1100, 1400, 1800' }}
+                  {%- when 'video' -%}
+                    {{ media | media_tag: image_size: '1600x', autoplay: false, loop: false, controls: true, preload: 'metadata' }}
+                  {%- when 'external_video' -%}
+                    {{ media | external_video_tag }}
+                  {%- when 'model' -%}
+                    {{ media | media_tag: image_size: '1600x' }}
+                  {%- else -%}
+                    {{ media | media_tag }}
+                {%- endcase -%}
+              </div>
+            {%- endfor -%}
+          </div>
+
+          <div class="main-product__thumbs collector-product__thumbs collector-product__thumbs--{{ section.settings.thumbnail_position }}" role="list" aria-label="Product media gallery">
+            {%- for media in product.media -%}
+              <button
+                type="button"
+                class="main-product__thumb collector-product__thumb{% if media.id == initial_media.id %} is-active{% endif %}"
+                data-media-thumb
+                data-target-media-id="{{ media.id }}"
+                aria-label="View media {{ forloop.index }}"
+                role="listitem"
+              >
+                {{ media.preview_image | image_url: width: 320 | image_tag: alt: media.alt | default: product.title, loading: 'lazy', widths: '120, 160, 240, 320' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          {% render 'responsive-image', image: product.featured_image, alt: product.title, width: 1400, loading: 'eager', fetchpriority: 'high' %}
+        {%- endif -%}
+      </div>
+
+      <div class="main-product__details collector-product__details">
+        <div class="main-product__sticky">
+          <div class="collector-product__purchase-panel collector-product__purchase-panel--button-{{ section.settings.button_style }}">
+            {%- if section.settings.drop_label != blank -%}
+              <p class="collector-product__drop-label">{{ section.settings.drop_label | escape }}</p>
+            {%- endif -%}
+
+            <h1 class="section-title main-product__title">{{ product.title }}</h1>
+
+            {%- if section.settings.product_description_position == 'below_title' -%}
+              {{ featured_description_markup }}
+            {%- endif -%}
+
+            {%- if section.settings.product_hook != blank -%}
+              <p class="collector-product__hook">{{ section.settings.product_hook | escape }}</p>
+            {%- endif -%}
+
+            <div class="main-product__meta" data-product-meta>
+              <span
+                class="product-badge product-badge--sale{% unless product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %} is-hidden{% endunless %}"
+                data-sale-badge
+              >
+                Sale
+              </span>
+              <span
+                class="product-badge product-badge--sold{% if product.selected_or_first_available_variant.available %} is-hidden{% endif %}"
+                data-sold-badge
+              >
+                Sold out
+              </span>
+              <span class="product-badge product-badge--unavailable is-hidden" data-unavailable-badge>Unavailable</span>
+            </div>
+
+            {% render 'price', product_or_variant: product.selected_or_first_available_variant %}
+            <p class="collector-product__availability" data-availability-message aria-live="polite"></p>
+
+            {%- if section.settings.product_description_position == 'below_price' -%}
+              {{ featured_description_markup }}
+            {%- endif -%}
+
+            {% form 'product', product %}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-variant-id-input>
+              {% render 'variant-picker', product: product, section: section %}
+              {% render 'quantity-input', section: section %}
+              {%- if section.settings.product_description_position == 'above_buy_buttons' -%}
+                {{ featured_description_markup }}
+              {%- endif -%}
+              {% render 'buy-buttons', product: product, form: form %}
+              {%- if section.settings.product_description_position == 'below_buy_buttons' -%}
+                {{ featured_description_markup }}
+              {%- endif -%}
+            {% endform %}
+
+            {%- if section.settings.trust_line_one != blank or section.settings.trust_line_two != blank or section.settings.trust_line_three != blank -%}
+              <div class="collector-product__buying-cues" aria-label="Collector purchase notes">
+                {%- if section.settings.trust_heading != blank -%}
+                  <p class="collector-product__trust-heading">{{ section.settings.trust_heading | escape }}</p>
+                {%- endif -%}
+                {%- if section.settings.trust_line_one != blank -%}
+                  <p class="collector-product__cue">{{ section.settings.trust_line_one | escape }}</p>
+                {%- endif -%}
+                {%- if section.settings.trust_line_two != blank -%}
+                  <p class="collector-product__cue">{{ section.settings.trust_line_two | escape }}</p>
+                {%- endif -%}
+                {%- if section.settings.trust_line_three != blank -%}
+                  <p class="collector-product__cue">{{ section.settings.trust_line_three | escape }}</p>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- if show_original_description -%}
+            <div id="ProductFullDescription-{{ section.id }}" class="collector-product__description-shell" aria-label="Product description">
+              <div class="rte collector-product__description">{{ product.description }}</div>
+            </div>
+          {%- endif -%}
+
+          <div class="main-product__accordions collector-product__info collector-product__info--{{ section.settings.info_layout }}">
+            {%- for block in section.blocks -%}
+              {%- if block.type == '@app' -%}
+                <div class="collector-product__app-block" {{ block.shopify_attributes }}>
+                  {% render block %}
+                </div>
+              {%- else -%}
+                {%- liquid
+                  assign block_heading = block.settings.heading
+                  assign block_content = block.settings.content
+                  assign block_visible = true
+
+                  if block.settings.show_block == false
+                    assign block_visible = false
+                  endif
+                -%}
+                {%- if block_visible and block_heading != blank and block_content != blank -%}
+                  {%- if section.settings.info_layout == 'panels' -%}
+                    <article class="value-card collector-product__panel" {{ block.shopify_attributes }}>
+                      <h3 class="collector-product__panel-title">{{ block_heading | escape }}</h3>
+                      <div class="rte">{{ block_content }}</div>
+                    </article>
+                  {%- else -%}
+                    <details class="value-card collector-product__accordion" data-product-detail-accordion {{ block.shopify_attributes }}>
+                      <summary
+                        aria-expanded="false"
+                        aria-controls="ProductDetail-{{ section.id }}-{{ block.id }}"
+                        data-product-detail-summary
+                      >
+                        <strong>{{ block_heading | escape }}</strong>
+                      </summary>
+                      <div id="ProductDetail-{{ section.id }}-{{ block.id }}" class="rte collector-product__accordion-content">
+                        {{ block_content }}
+                      </div>
+                    </details>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .collector-product__featured-item {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item.is-active {
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item img,
+  #shopify-section-{{ section.id }} .collector-product__featured-item video,
+  #shopify-section-{{ section.id }} .collector-product__featured-item iframe,
+  #shopify-section-{{ section.id }} .collector-product__featured-item model-viewer {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured {
+    width: min(100%, var(--product-media-max-width, 720px));
+    max-height: var(--product-media-max-height, 720px);
+    margin-inline: auto;
+    padding: var(--product-media-padding, 16px);
+    border: var(--product-media-border-width, 1px) solid color-mix(in srgb, var(--product-media-border-color, #2A2B2F) var(--product-media-border-opacity, 20%), transparent);
+    border-radius: var(--product-media-border-radius, 18px);
+    background:
+      radial-gradient(circle at 72% 12%, color-mix(in srgb, var(--ds-color-accent, #C6FF3D) 10%, transparent) 0%, transparent 45%),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--ds-color-surface-1, #17181B) var(--product-media-background-opacity, 35%), transparent) 0%,
+        color-mix(in srgb, var(--ds-color-surface-0, #101113) var(--product-media-background-opacity, 35%), transparent) 100%
+      );
+    box-shadow: var(--product-media-shadow, none);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item {
+    overflow: hidden;
+    border-radius: max(0px, calc(var(--product-media-border-radius, 18px) - var(--product-media-padding, 16px)));
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item,
+  #shopify-section-{{ section.id }} .collector-product__featured-item img {
+    max-height: var(--product-media-max-height, 720px);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product {
+    align-items: start;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__media {
+    width: 100%;
+    display: grid;
+    gap: clamp(0.55rem, 1vw, 0.85rem);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__details {
+    width: 100%;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__media--sticky {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured {
+    aspect-ratio: var(--product-media-ratio, auto);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item.is-active {
+    height: 100%;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item img {
+    height: 100%;
+    object-fit: var(--product-media-fit, contain);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item img {
+    transition: transform var(--ds-time-slow, 360ms) var(--ds-ease-standard, ease);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__featured-item:hover img {
+    transform: scale(1.025);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__thumbs {
+    gap: var(--product-thumbnail-gap, 10px);
+    grid-template-columns: repeat(auto-fit, minmax(var(--product-thumbnail-size, 76px), var(--product-thumbnail-size, 76px)));
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__thumb {
+    cursor: pointer;
+    padding: 0;
+    background: none;
+    aspect-ratio: 1 / 1;
+    width: var(--product-thumbnail-size, 76px);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__thumb.is-active {
+    border-color: var(--ds-color-accent, #C6FF3D);
+    box-shadow: inset 0 0 0 1px var(--ds-color-accent, #C6FF3D);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__description-shell {
+    margin-top: 1rem;
+    padding: clamp(1rem, 2vw, 1.35rem);
+    border: 1px solid color-mix(in srgb, var(--ds-color-border, #2A2B2F) 82%, var(--product-panel-accent, #C6FF3D) 18%);
+    border-radius: var(--ds-radius-md, 0.3rem);
+    background: color-mix(in srgb, var(--ds-color-surface-1, #17181B) 82%, black 18%);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__description {
+    color: var(--ds-color-text, #F4EFE6);
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description {
+    display: grid;
+    gap: 0.65rem;
+    padding: clamp(0.9rem, 2vw, 1.1rem);
+    border: 1px solid color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 16%, #2A2B2F 84%);
+    border-radius: var(--ds-radius-md, 0.3rem);
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--product-panel-bg, #17181B) 88%, white 12%),
+        color-mix(in srgb, var(--product-panel-bg, #17181B) 88%, black 12%)
+      );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description__heading {
+    margin: 0;
+    color: var(--product-panel-accent, #C6FF3D);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description__content {
+    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 84%, white 16%);
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  html:not(.no-js) #shopify-section-{{ section.id }} .product-featured-description:not(.product-featured-description--expanded) .product-featured-description__content {
+    max-height: var(--featured-description-max-height, 180px);
+    overflow: hidden;
+  }
+
+  html.no-js #shopify-section-{{ section.id }} .product-featured-description__toggle {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 0.85rem;
+    align-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description__toggle,
+  #shopify-section-{{ section.id }} .product-featured-description__link {
+    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 82%, var(--product-panel-accent, #C6FF3D) 18%);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description__toggle {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .product-featured-description__toggle:focus-visible,
+  #shopify-section-{{ section.id }} .product-featured-description__link:focus-visible {
+    outline: none;
+    border-radius: var(--ds-radius-sm, 0.25rem);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 42%, transparent);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel {
+    display: grid;
+    gap: var(--product-panel-spacing, 16px);
+    padding: clamp(1.15rem, 2.6vw, calc(var(--product-panel-spacing, 16px) + 18px));
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--product-panel-bg, #17181B) 86%, white 14%) 0%,
+      color-mix(in srgb, var(--product-panel-bg, #17181B) 92%, var(--product-panel-accent, #C6FF3D) 8%) 42%,
+      var(--product-panel-bg, #17181B) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 34%, #2A2B2F 66%);
+    border-radius: var(--ds-radius-lg, 0.5rem);
+    color: var(--product-panel-text, #F4EFE6);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__drop-label,
+  #shopify-section-{{ section.id }} .collector-product__trust-heading {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--product-panel-accent, #C6FF3D);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__hook {
+    margin: -0.45rem 0 0;
+    max-width: 42rem;
+    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 74%, white 26%);
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel form {
+    display: grid;
+    gap: 0.95rem;
+    padding-top: 0.1rem;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .price {
+    font-size: clamp(1.35rem, 1.2rem + 0.65vw, 1.9rem);
+    line-height: 1.1;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .price__compare {
+    margin-left: 0.5rem;
+    opacity: 0.72;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker {
+    gap: 0.85rem;
+  }
+
+  #shopify-section-{{ section.id }} .variant-picker__group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker label,
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker__legend,
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .product-quantity__label {
+    margin: 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 80%, white 20%);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker__legend {
+    margin-bottom: 0.55rem;
+    padding: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker__select-label {
+    display: block;
+    margin-bottom: 0.45rem;
+  }
+
+  #shopify-section-{{ section.id }} .variant-picker--premium-ready .variant-picker__group--cards .variant-picker__select-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #shopify-section-{{ section.id }} .variant-picker--premium-ready .variant-picker__group--cards select[data-premium-option-source] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker select,
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .product-quantity__input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.68rem 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 28%, #3A3A3A 72%);
+    border-radius: var(--ds-radius-sm, 0.25rem);
+    background: color-mix(in srgb, var(--product-panel-bg, #17181B) 88%, black 12%);
+    color: var(--product-panel-text, #F4EFE6);
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-cards {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .variant-picker--premium-ready .premium-option-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    gap: 0.55rem;
+  }
+
+  #shopify-section-{{ section.id }} .variant-picker--premium-ready [data-option-card-type="material"] .premium-option-cards {
+    grid-template-columns: 1fr;
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    min-height: 54px;
+    padding: 0.8rem 0.85rem;
+    text-align: left;
+    border: 1px solid color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 20%, #3A3A3A 80%);
+    border-radius: var(--ds-radius-sm, 0.25rem);
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--product-panel-bg, #17181B) 84%, white 16%), color-mix(in srgb, var(--product-panel-bg, #17181B) 90%, black 10%));
+    color: var(--product-panel-text, #F4EFE6);
+    cursor: pointer;
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card:hover {
+    border-color: color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 48%, #3A3A3A 52%);
+    transform: translateY(-1px);
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card:focus-visible {
+    outline: none;
+    border-color: var(--product-panel-accent, #C6FF3D);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 44%, transparent);
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card.is-selected {
+    border-color: var(--product-panel-accent, #C6FF3D);
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 15%, var(--product-panel-bg, #17181B) 85%), color-mix(in srgb, var(--product-panel-bg, #17181B) 84%, black 16%));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 80%, white 20%);
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card.is-unavailable:not(.is-selected) {
+    opacity: 0.46;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card__label {
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card__helper {
+    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 66%, white 34%);
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  #shopify-section-{{ section.id }} .premium-option-card__state {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .variant-picker select:focus-visible,
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel .product-quantity__input:focus-visible {
+    outline: none;
+    border-color: var(--product-panel-accent, #C6FF3D);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 40%, transparent);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__availability {
+    margin: -0.1rem 0 0;
+    font-size: 0.86rem;
+    color: color-mix(in srgb, var(--product-panel-text, #F4EFE6) 72%, white 28%);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__buying-cues {
+    margin-top: 0;
+    border-color: color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 18%, #2A2B2F 82%);
+    background: color-mix(in srgb, var(--product-panel-bg, #17181B) 82%, black 18%);
+  }
+
+  #shopify-section-{{ section.id }} .product-quantity__controls {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .product-quantity__button {
+    min-height: 44px;
+    border-radius: var(--ds-radius-sm, 0.25rem);
+    border: 1px solid color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 30%, #3A3A3A 70%);
+    background: color-mix(in srgb, var(--product-panel-bg, #17181B) 78%, black 22%);
+    color: var(--product-panel-text, #F4EFE6);
+    cursor: pointer;
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  #shopify-section-{{ section.id }} .buy-buttons {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  #shopify-section-{{ section.id }} .buy-buttons .btn {
+    min-height: 52px;
+    border-radius: var(--ds-radius-md, 0.3rem);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--product-panel-accent, #C6FF3D);
+    background: var(--product-panel-accent, #C6FF3D);
+    color: #101113;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__purchase-panel--button-outline .buy-buttons .btn {
+    background: transparent;
+    color: var(--product-panel-text, #F4EFE6);
+  }
+
+  #shopify-section-{{ section.id }} .buy-buttons .btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  #shopify-section-{{ section.id }} .product-badge--unavailable {
+    border-color: #ff8a80;
+    color: #ffb3ad;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__buying-cues {
+    margin-top: 0.15rem;
+    padding: 0.9rem 0.95rem;
+    border: 1px solid var(--ds-color-border, #2A2B2F);
+    border-radius: var(--ds-radius-md, 0.2rem);
+    background: color-mix(in srgb, var(--ds-color-surface-1, #17181B) 75%, var(--ds-color-surface-0, #101113) 25%);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__cue {
+    margin: 0;
+    color: var(--ds-color-text-muted, #A7A29A);
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__cue + .collector-product__cue {
+    margin-top: 0.3rem;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__trust-heading + .collector-product__cue {
+    margin-top: 0.45rem;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__cue--low-stock {
+    color: var(--ds-color-text-strong, #F4EFE6);
+    font-weight: 600;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__info--panels {
+    gap: 0.9rem;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__info {
+    margin-top: 1rem;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__panel,
+  #shopify-section-{{ section.id }} .collector-product__accordion {
+    border-color: color-mix(in srgb, var(--ds-color-border, #2A2B2F) 78%, var(--product-panel-accent, #C6FF3D) 22%);
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--ds-color-surface-1, #17181B) 88%, white 12%), color-mix(in srgb, var(--ds-color-surface-0, #101113) 92%, var(--product-panel-accent, #C6FF3D) 8%));
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__panel-title {
+    margin: 0 0 0.55rem;
+    font-family: var(--ds-font-heading, var(--font-heading));
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    cursor: pointer;
+    color: var(--ds-color-text-strong, #F4EFE6);
+    list-style: none;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion summary::after {
+    content: "+";
+    flex: 0 0 auto;
+    color: var(--product-panel-accent, #C6FF3D);
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion[open] summary::after {
+    content: "-";
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion summary:focus-visible {
+    outline: none;
+    border-radius: var(--ds-radius-sm, 0.25rem);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--product-panel-accent, #C6FF3D) 42%, transparent);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion-content {
+    margin-top: 0.8rem;
+    color: var(--ds-color-text, #F4EFE6);
+  }
+
+  #shopify-section-{{ section.id }} .collector-product__accordion .rte,
+  #shopify-section-{{ section.id }} .collector-product__panel .rte,
+  #shopify-section-{{ section.id }} .collector-product__app-block {
+    color: var(--ds-color-text, #F4EFE6);
+  }
+
+  #shopify-section-{{ section.id }} .product-badge.is-hidden {
+    display: none;
+  }
+
+  @media (max-width: 749px) {
+    #shopify-section-{{ section.id }} .collector-product__media {
+      width: 100%;
+      position: static;
+    }
+
+    #shopify-section-{{ section.id }} .collector-product__featured {
+      width: min(100%, var(--product-media-max-width, 720px));
+      max-width: 100%;
+    }
+
+    #shopify-section-{{ section.id }} .collector-product__featured-item img {
+      height: 100%;
+      object-fit: var(--product-media-fit, contain);
+    }
+
+    #shopify-section-{{ section.id }} .collector-product__thumbs {
+      grid-template-columns: repeat(auto-fit, minmax(var(--product-thumbnail-size, 76px), var(--product-thumbnail-size, 76px)));
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    #shopify-section-{{ section.id }} .collector-product__thumbs::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    #shopify-section-{{ section.id }} .product-featured-description {
+      padding: 0.85rem;
+      gap: 0.5rem;
+    }
+
+    #shopify-section-{{ section.id }} .product-featured-description__content {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+  }
+
+  @media (min-width: 750px) {
+    #shopify-section-{{ section.id }} .collector-product__featured-item img {
+      height: 100%;
+      object-fit: var(--product-media-fit, contain);
+    }
+
+    #shopify-section-{{ section.id }} .collector-product__thumbs--left {
+      order: -1;
+      grid-template-columns: 1fr;
+      max-width: var(--product-thumbnail-size, 76px);
+    }
+
+    #shopify-section-{{ section.id }} .collector-product__media--thumbs-left {
+      grid-template-columns: var(--product-thumbnail-size, 76px) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  @media (min-width: 990px) {
+    #shopify-section-{{ section.id }} .collector-product {
+      grid-template-columns: minmax(0, var(--product-media-desktop-width, 54%)) minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 750px) and (max-width: 989px) {
+    #shopify-section-{{ section.id }} .collector-product {
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{ section.id }} .main-product__sticky,
+    #shopify-section-{{ section.id }} .collector-product__media--sticky {
+      position: static;
+    }
+  }
+</style>
+
+<script type="application/json" data-product-variants>
+  [
+    {%- for variant in product.variants -%}
+      {
+        "id": {{ variant.id | json }},
+        "options": {{ variant.options | json }},
+        "available": {{ variant.available | json }},
+        "price": {{ variant.price | json }},
+        "compare_at_price": {{ variant.compare_at_price | json }},
+        "featured_media": {%- if variant.featured_media -%}{ "id": {{ variant.featured_media.id | json }} }{%- else -%}null{%- endif -%}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]
+</script>
+
+<script type="application/json" data-product-money-format>
+  {{ shop.money_format | json }}
+</script>
+
+{% schema %}
+{
+  "name": "Main product",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media controls"
+    },
+    {
+      "type": "select",
+      "id": "media_box_ratio",
+      "label": "Media box shape",
+      "info": "Choose the visible frame ratio for the main product media. Auto keeps the media as close to its natural layout as possible.",
+      "default": "auto",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "16:9", "label": "16:9 wide artwork" },
+        { "value": "4:3", "label": "4:3 landscape" },
+        { "value": "3:2", "label": "3:2 classic print" },
+        { "value": "1:1", "label": "1:1 square" },
+        { "value": "2:3", "label": "2:3 portrait" },
+        { "value": "3:4", "label": "3:4 portrait" },
+        { "value": "custom", "label": "Custom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "custom_media_box_ratio_width",
+      "label": "Custom ratio width",
+      "info": "Used only when media box shape is set to Custom.",
+      "min": 1,
+      "max": 32,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "custom_media_box_ratio_height",
+      "label": "Custom ratio height",
+      "info": "Used only when media box shape is set to Custom.",
+      "min": 1,
+      "max": 32,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "select",
+      "id": "media_object_fit",
+      "label": "Image fit inside media box",
+      "info": "Contain shows the full artwork. Cover fills the box and may crop image media. Video and 3D media keep their native rendering.",
+      "default": "contain",
+      "options": [
+        { "value": "contain", "label": "Contain full artwork" },
+        { "value": "cover", "label": "Cover frame" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "media_desktop_width",
+      "label": "Desktop media column width",
+      "info": "Controls how much horizontal space the media column takes on desktop.",
+      "min": 40,
+      "max": 70,
+      "step": 1,
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "media_box_max_width",
+      "label": "Media box max width",
+      "info": "Caps the visible media frame width so artwork does not become oversized.",
+      "min": 320,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 720
+    },
+    {
+      "type": "range",
+      "id": "media_box_max_height",
+      "label": "Media box max height",
+      "info": "Caps the visible media frame height on large screens.",
+      "min": 320,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 720
+    },
+    {
+      "type": "range",
+      "id": "media_box_padding",
+      "label": "Media box padding",
+      "info": "Adds breathing room between the artwork and the frame.",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "media_box_border_width",
+      "label": "Media box border width",
+      "info": "Keep this subtle for a premium dark gallery frame.",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "media_box_border_radius",
+      "label": "Media box corner radius",
+      "info": "Controls the roundness of the main media frame.",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "media_box_border_opacity",
+      "label": "Media box border opacity",
+      "info": "Adjusts how visible the frame border feels.",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "media_box_border_color",
+      "label": "Media box border color",
+      "default": "#2A2B2F"
+    },
+    {
+      "type": "range",
+      "id": "media_box_background_opacity",
+      "label": "Media box background opacity",
+      "info": "Controls the subtle dark backing behind transparent or contained artwork.",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "checkbox",
+      "id": "media_box_enable_shadow",
+      "label": "Enable media box shadow",
+      "info": "Adds a restrained premium shadow around the artwork frame.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_size",
+      "label": "Thumbnail size",
+      "info": "Controls the product media thumbnail width and height.",
+      "min": 52,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 76
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_gap",
+      "label": "Thumbnail gap",
+      "info": "Controls spacing between product media thumbnails.",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_media_desktop",
+      "label": "Sticky media on desktop",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "thumbnail_position",
+      "label": "Thumbnail position",
+      "default": "bottom",
+      "options": [
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Variant option controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_premium_option_cards",
+      "label": "Enable premium option cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "use_cards_for_material",
+      "label": "Use cards for material options",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "use_cards_for_size",
+      "label": "Use cards for size options",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "size_card_value_limit",
+      "label": "Maximum size values shown as cards",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_material_helper_copy",
+      "label": "Show material helper copy",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Purchase panel controls"
+    },
+    {
+      "type": "text",
+      "id": "drop_label",
+      "label": "Drop label",
+      "default": "Limited collector drop"
+    },
+    {
+      "type": "text",
+      "id": "product_hook",
+      "label": "Short product hook",
+      "default": "Premium print release, prepared for display and long-term collecting."
+    },
+    {
+      "type": "header",
+      "content": "Featured description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_description",
+      "label": "Show featured description",
+      "info": "Displays the product description as a prominent collector-story card near the buy box.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "product_description_position",
+      "label": "Featured description position",
+      "info": "Choose where the prominent description appears in the product information column.",
+      "default": "below_price",
+      "options": [
+        { "value": "below_title", "label": "Below title" },
+        { "value": "below_price", "label": "Below price" },
+        { "value": "above_buy_buttons", "label": "Above buy buttons" },
+        { "value": "below_buy_buttons", "label": "Below buy buttons" },
+        { "value": "original_location_only", "label": "Original location only" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "featured_description_heading",
+      "label": "Featured description heading",
+      "default": "The Piece"
+    },
+    {
+      "type": "range",
+      "id": "featured_description_max_height",
+      "label": "Collapsed featured description height",
+      "info": "Controls how much description shows before shoppers use Read more.",
+      "min": 80,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_original_description_when_featured",
+      "label": "Hide lower full description when featured description is shown",
+      "info": "When enabled, shoppers can still expand the featured card to read the full product description.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "panel_background",
+      "label": "Panel background",
+      "default": "#17181b"
+    },
+    {
+      "type": "color",
+      "id": "panel_text_color",
+      "label": "Panel text color",
+      "default": "#f4efe6"
+    },
+    {
+      "type": "color",
+      "id": "panel_accent_color",
+      "label": "Panel accent color",
+      "default": "#c6ff3d"
+    },
+    {
+      "type": "range",
+      "id": "panel_spacing",
+      "label": "Panel spacing",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "default": "solid",
+      "options": [
+        { "value": "solid", "label": "Solid" },
+        { "value": "outline", "label": "Outline" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "info_layout",
+      "label": "Collector info layout",
+      "default": "accordion",
+      "options": [
+        { "value": "accordion", "label": "Accordion" },
+        { "value": "panels", "label": "Editorial panels" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "trust_heading",
+      "label": "Trust microcopy heading",
+      "default": "Collector confidence"
+    },
+    {
+      "type": "text",
+      "id": "trust_line_one",
+      "label": "Trust line 1",
+      "default": "Collector-safe packaging and tracked delivery included."
+    },
+    {
+      "type": "text",
+      "id": "trust_line_two",
+      "label": "Trust line 2",
+      "default": "Secure checkout with protected payment methods."
+    },
+    {
+      "type": "text",
+      "id": "trust_line_three",
+      "label": "Trust line 3",
+      "default": "Printed and fulfilled with archive-quality handling."
+    },
+    { "type": "paragraph", "content": "Add or reorder collector storytelling blocks below. Product form, price, variants, and checkout remain native Shopify." }
+  ],
+  "blocks": [
+    {
+      "type": "the_piece",
+      "name": "The Piece",
+      "settings": [
+        { "type": "checkbox", "id": "show_block", "label": "Show this block", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "The Piece" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>A battle-worn street machine captured under saturated cyberpunk city light. Rain, neon, and scarred metal give the work a gritty underground collector energy.</p>" }
+      ]
+    },
+    {
+      "type": "best_for",
+      "name": "Best For",
+      "settings": [
+        { "type": "checkbox", "id": "show_block", "label": "Show this block", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Best For" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Gaming rooms, garages, industrial lofts, modern offices, studios, and statement walls.</p>" }
+      ]
+    },
+    {
+      "type": "materials_finish",
+      "name": "Materials & Finish",
+      "settings": [
+        { "type": "checkbox", "id": "show_block", "label": "Show this block", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Materials & Finish" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Available as gallery-grade canvas or metal print options depending on the product variant setup.</p>" }
+      ]
+    },
+    {
+      "type": "shipping_packaging_detail",
+      "name": "Shipping & Packaging",
+      "settings": [
+        { "type": "checkbox", "id": "show_block", "label": "Show this block", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shipping & Packaging" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Collector-safe packaging and tracked delivery are included with every order.</p>" }
+      ]
+    },
+    {
+      "type": "size_guide",
+      "name": "Size Guide",
+      "settings": [
+        { "type": "checkbox", "id": "show_block", "label": "Show this block", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Size Guide" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>12x18: compact accent piece.<br>18x24: standard wall feature.<br>24x36: large statement piece.<br>30x45: oversized collector centerpiece.</p>" }
+      ]
+    },
+    {
+      "type": "artwork_story",
+      "name": "Artwork story",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Artwork Story" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Share the narrative, influences, and cultural context behind this work.</p>" }
+      ]
+    },
+    {
+      "type": "edition_details",
+      "name": "Edition details",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Edition Details" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Add release format, run information, and collector notes.</p>" }
+      ]
+    },
+    {
+      "type": "print_material",
+      "name": "Print material",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Print Material" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Describe substrate, finish, and print process quality.</p>" }
+      ]
+    },
+    {
+      "type": "size_fit",
+      "name": "Size & room impact",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Size & Room Impact" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Guide buyers on scale and visual impact in different spaces.</p>" }
+      ]
+    },
+    {
+      "type": "collector_notes",
+      "name": "Collector notes",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Collector Notes" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Include curation notes, pairings, or archive context.</p>" }
+      ]
+    },
+    {
+      "type": "shipping_packaging",
+      "name": "Shipping & packaging note",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shipping & Packaging" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Shipped with collector-safe packaging and tracked delivery.</p>" }
+      ]
+    },
+    {
+      "type": "collapsible",
+      "name": "Custom collapsible row",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Product details" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Add product details here.</p>" }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,372 @@
+{%- liquid
+  assign section_height = section.settings.section_height
+  assign min_height = '70vh'
+
+  case section_height
+    when 'small'
+      assign min_height = '56vh'
+    when 'medium'
+      assign min_height = '70vh'
+    when 'large'
+      assign min_height = '84vh'
+  endcase
+-%}
+
+<section
+  id="CinematicHero-{{ section.id }}"
+  class="cinematic-hero-section"
+  style="
+    --ch-min-height: {% if section.settings.full_viewport %}100svh{% else %}{{ min_height }}{% endif %};
+    --ch-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --ch-content-align: {{ section.settings.text_alignment }};
+  "
+>
+  <div class="cinematic-hero">
+    <div class="cinematic-hero__media" aria-hidden="true">
+      {%- if section.settings.background_video != blank -%}
+        {{
+          section.settings.background_video
+          | video_tag:
+            autoplay: true,
+            loop: true,
+            muted: true,
+            controls: false,
+            playsinline: true,
+            preload: 'metadata',
+            class: 'cinematic-hero__video'
+        }}
+      {%- elsif section.settings.desktop_image != blank or section.settings.mobile_image != blank -%}
+        <picture>
+          {%- if section.settings.mobile_image != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ section.settings.mobile_image | image_url: width: 480 }} 480w,
+                {{ section.settings.mobile_image | image_url: width: 720 }} 720w,
+                {{ section.settings.mobile_image | image_url: width: 960 }} 960w
+              "
+              sizes="100vw"
+            >
+          {%- endif -%}
+          {%- assign fallback_image = section.settings.desktop_image | default: section.settings.mobile_image -%}
+          {{
+            fallback_image
+            | image_url: width: 2400
+            | image_tag:
+              class: 'cinematic-hero__image',
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '750, 1100, 1500, 2000, 2400',
+              sizes: '100vw',
+              alt: section.settings.heading
+          }}
+        </picture>
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'cinematic-hero__image' }}
+      {%- endif -%}
+    </div>
+
+    <div class="cinematic-hero__gradient"></div>
+    <div class="cinematic-hero__grain"></div>
+
+    <div class="cinematic-hero__inner page-width">
+      <div class="cinematic-hero__content reveal-fade-up" data-reveal="deep">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="cinematic-hero__eyebrow label-kicker reveal-fade-up reveal-delay-1" data-reveal="subtle">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          {%- if request.page_type == 'index' -%}
+            <h1 class="cinematic-hero__heading reveal-fade-up reveal-delay-2" data-reveal>{{ section.settings.heading | escape }}</h1>
+          {%- else -%}
+            <h2 class="cinematic-hero__heading reveal-fade-up reveal-delay-2" data-reveal>{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- if section.settings.subheading != blank -%}
+          <p class="cinematic-hero__subheading reveal-fade-up reveal-delay-3" data-reveal="subtle">{{ section.settings.subheading | escape }}</p>
+        {%- endif -%}
+
+        <div class="cinematic-hero__actions reveal-fade-up reveal-delay-4" data-reveal="subtle" role="group" aria-label="Hero actions">
+          {%- if section.settings.primary_cta_label != blank and section.settings.primary_cta_link != blank -%}
+            <a class="btn-premium" href="{{ section.settings.primary_cta_link }}" aria-label="{{ section.settings.primary_cta_label | escape }}">
+              {{ section.settings.primary_cta_label | escape }}
+            </a>
+          {%- endif -%}
+
+          {%- if section.settings.secondary_cta_label != blank and section.settings.secondary_cta_link != blank -%}
+            <a class="btn btn-secondary" href="{{ section.settings.secondary_cta_link }}" aria-label="{{ section.settings.secondary_cta_label | escape }}">
+              {{ section.settings.secondary_cta_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #CinematicHero-{{ section.id }} {
+    position: relative;
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero {
+    position: relative;
+    min-height: var(--ch-min-height);
+    isolation: isolate;
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+    background: var(--ds-color-surface-0, #0f1014);
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__media,
+  #CinematicHero-{{ section.id }} .cinematic-hero__gradient,
+  #CinematicHero-{{ section.id }} .cinematic-hero__grain {
+    position: absolute;
+    inset: 0;
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__image,
+  #CinematicHero-{{ section.id }} .cinematic-hero__video,
+  #CinematicHero-{{ section.id }} .cinematic-hero__video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: cinematic-hero-scale-{{ section.id }} 24s var(--ds-ease-standard, ease) infinite alternate;
+    transform-origin: center center;
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__gradient {
+    z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(8, 10, 14, calc(var(--ch-overlay-opacity) + 0.18)) 0%, rgba(8, 10, 14, calc(var(--ch-overlay-opacity) * 0.72)) 48%, rgba(8, 10, 14, calc(var(--ch-overlay-opacity) * 0.35)) 100%),
+      linear-gradient(180deg, rgba(8, 10, 14, 0.22) 0%, rgba(8, 10, 14, 0.7) 100%);
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__grain {
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.11;
+    mix-blend-mode: soft-light;
+    background-image:
+      radial-gradient(rgba(255, 255, 255, 0.24) 0.6px, transparent 0.6px),
+      radial-gradient(rgba(255, 255, 255, 0.12) 0.6px, transparent 0.6px);
+    background-size: 3px 3px, 5px 5px;
+    background-position: 0 0, 1px 1px;
+    animation: cinematic-grain-{{ section.id }} 0.8s steps(3) infinite;
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__inner {
+    position: relative;
+    z-index: 3;
+    width: min(100% - 2rem, var(--page-width));
+    margin-inline: auto;
+    padding-block: clamp(2.5rem, 7vw, 6rem);
+    display: grid;
+    justify-items: var(--ch-content-align);
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__content {
+    max-width: min(40rem, 100%);
+    text-align: var(--ch-content-align);
+    color: var(--ds-color-text-strong, #f7f4ef);
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__eyebrow {
+    margin: 0 0 0.9rem;
+    color: color-mix(in srgb, var(--ds-color-text, #ece9e4) 78%, transparent);
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__heading {
+    margin: 0;
+    font-family: var(--ds-font-heading, var(--font-heading));
+    font-size: clamp(2.1rem, 6vw, 5rem);
+    line-height: 0.94;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__subheading {
+    margin: 1rem 0 0;
+    max-width: 42ch;
+    font-family: var(--ds-font-body, var(--font-body));
+    font-size: clamp(1rem, 2.1vw, 1.3rem);
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--ds-color-text, #ece9e4) 85%, transparent);
+  }
+
+  #CinematicHero-{{ section.id }} .cinematic-hero__actions {
+    margin-top: 1.4rem;
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+
+  @keyframes cinematic-hero-scale-{{ section.id }} {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
+  }
+
+  @keyframes cinematic-grain-{{ section.id }} {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-1px, 1px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(1px, 1px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @media (max-width: 989px) {
+    #CinematicHero-{{ section.id }} .cinematic-hero__inner {
+      width: min(100% - 1.5rem, var(--page-width));
+      padding-block: clamp(2.2rem, 8vw, 4.4rem);
+    }
+
+    #CinematicHero-{{ section.id }} .cinematic-hero__content {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 749px) {
+    #CinematicHero-{{ section.id }} .cinematic-hero {
+      min-height: max(var(--ch-min-height), 74svh);
+    }
+
+    #CinematicHero-{{ section.id }} .cinematic-hero__heading {
+      font-size: clamp(1.85rem, 9.5vw, 2.9rem);
+    }
+
+    #CinematicHero-{{ section.id }} .cinematic-hero__subheading {
+      font-size: 1rem;
+      max-width: 34ch;
+    }
+
+    #CinematicHero-{{ section.id }} .cinematic-hero__actions {
+      width: 100%;
+      gap: 0.6rem;
+    }
+
+    #CinematicHero-{{ section.id }} .cinematic-hero__actions > a {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #CinematicHero-{{ section.id }} .cinematic-hero__image,
+    #CinematicHero-{{ section.id }} .cinematic-hero__video,
+    #CinematicHero-{{ section.id }} .cinematic-hero__video video,
+    #CinematicHero-{{ section.id }} .cinematic-hero__grain {
+      animation: none;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Cinematic Hero",
+  "tag": "section",
+  "class": "section-cinematic-hero",
+  "settings": [
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video (optional)"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "default": 55,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Render-Lab Archive"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Artifacts From A Digital Future"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Limited-run canvas and metal prints for collectors of digital decay, street culture, and cinematic chaos."
+    },
+    {
+      "type": "text",
+      "id": "primary_cta_label",
+      "label": "Primary CTA label",
+      "default": "Enter the archive"
+    },
+    {
+      "type": "url",
+      "id": "primary_cta_link",
+      "label": "Primary CTA link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_cta_label",
+      "label": "Secondary CTA label",
+      "default": "Browse limited runs"
+    },
+    {
+      "type": "url",
+      "id": "secondary_cta_link",
+      "label": "Secondary CTA link"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section height",
+      "default": "large",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "full_viewport",
+      "label": "Use full viewport height",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cinematic Hero"
+    }
+  ]
+}
+{% endschema %}

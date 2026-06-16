@@ -1,0 +1,50 @@
+<section class="section-shell">
+  <div class="page-width">
+    {% render 'breadcrumbs' %}
+    <h1 class="section-title">Search</h1>
+    <form action="{{ routes.search_url }}" method="get" role="search">
+      <label for="Search-In-Page">Search</label>
+      <input id="Search-In-Page" type="search" name="q" value="{{ search.terms | escape }}">
+      <label for="SearchType">Search in</label>
+      <select id="SearchType" name="type">
+        <option value="product" {% if search.types contains 'product' %}selected{% endif %}>Products</option>
+        <option value="article,page" {% unless search.types contains 'product' %}selected{% endunless %}>Content</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Search {% render 'loading-spinner' %}</button>
+    </form>
+    {% if search.performed %}
+      <p>{{ search.results_count }} results for “{{ search.terms | escape }}”</p>
+      {% if search.results_count == 0 %}
+        <article class="value-card">
+          <h3>No matches found</h3>
+          <p>Try fewer words, different terms, or browse collections.</p>
+          <a class="btn btn-primary" href="{{ routes.all_products_collection_url }}">Browse products</a>
+        </article>
+      {% else %}
+        {% paginate search.results by section.settings.results_per_page %}
+          <div class="category-grid">
+            {% for item in search.results %}
+              {% if item.object_type == 'product' %}
+                {% render 'product-card', product: item %}
+              {% else %}
+                <article class="value-card">
+                  <h3><a href="{{ item.url }}">{{ item.title }}</a></h3>
+                </article>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% render 'pagination', paginate: paginate %}
+        {% endpaginate %}
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Main search",
+  "settings": [
+    { "type": "range", "id": "results_per_page", "label": "Results per page", "min": 8, "max": 24, "step": 2, "default": 12 }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,37 @@
+{
+  "sections": {
+    "hero": {
+      "type": "lore-page-hero",
+      "settings": {
+        "eyebrow": "Inside Render-Lab",
+        "heading": "The Lab",
+        "text": "<p>Process notes, material decisions, and release logic behind every collector work.</p>"
+      }
+    },
+    "split": {
+      "type": "lore-editorial-split",
+      "settings": {
+        "eyebrow": "Process",
+        "heading": "Where Culture Meets Craft",
+        "text": "<p>Each piece moves through curation, composition, print testing, and archive documentation before release.</p>",
+        "cta_label": "See Print Process",
+        "cta_link": "/pages/print-process"
+      }
+    },
+    "process": {
+      "type": "lore-process-steps",
+      "settings": {
+        "eyebrow": "Workflow",
+        "heading": "How We Build Each Release",
+        "intro": "<p>From reference gathering to final packaging, each step is built for collector confidence.</p>"
+      },
+      "blocks": {
+        "step_1": {"type":"step","settings":{"heading":"Signal Capture","text":"<p>Reference pulls from street visuals, game-era motifs, and cinematic framing.</p>"}},
+        "step_2": {"type":"step","settings":{"heading":"Composition Build","text":"<p>Layered scenes are shaped for atmosphere, depth, and long-view display impact.</p>"}},
+        "step_3": {"type":"step","settings":{"heading":"Print Validation","text":"<p>Color and finish checks ensure the physical piece holds the same visual force as the source.</p>"}}
+      },
+      "block_order": ["step_1","step_2","step_3"]
+    }
+  },
+  "order": ["hero", "split", "process"]
+}

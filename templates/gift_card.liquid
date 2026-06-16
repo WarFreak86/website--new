@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ shop.name }} - Gift card</title>
+    {{ content_for_header }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+  </head>
+  <body class="gift-card-template">
+    <main class="section-shell">
+      <div class="page-width" style="max-width:640px; text-align:center;">
+        <h1 class="section-title">{{ shop.name }} gift card</h1>
+        <p>{{ gift_card.initial_value | money }}</p>
+        {% if gift_card.enabled %}
+          <p>{{ gift_card.code | format_code }}</p>
+          {% if gift_card.expires_on %}
+            <p>Expires on {{ gift_card.expires_on | date: "%B %d, %Y" }}</p>
+          {% endif %}
+        {% endif %}
+        <a class="btn btn-primary" href="{{ shop.url }}">Continue shopping</a>
+      </div>
+    </main>
+  </body>
+</html>

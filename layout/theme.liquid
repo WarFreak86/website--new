@@ -1,0 +1,112 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_dark }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    {%- liquid
+      assign seo_title = page_title
+      assign seo_description = page_description
+      assign seo_image = page_image | default: settings.seo_share_image
+      assign twitter_handle = settings.social_twitter_handle
+
+      if request.page_type == 'index'
+        if settings.homepage_seo_title != blank
+          assign seo_title = settings.homepage_seo_title
+        endif
+        if settings.homepage_seo_description != blank
+          assign seo_description = settings.homepage_seo_description
+        endif
+      endif
+
+      if seo_description == blank and settings.default_seo_description != blank
+        assign seo_description = settings.default_seo_description
+      endif
+    -%}
+
+    <title>
+      {{ seo_title }}
+      {%- if current_tags %} &ndash; tagged {{ current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless seo_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {%- if seo_description != blank -%}
+      <meta name="description" content="{{ seo_description | strip_html | escape }}">
+    {%- endif -%}
+
+    <meta property="og:site_name" content="{{ shop.name | escape }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{{ seo_title | escape }}">
+    <meta property="og:type" content="{% if request.page_type == 'product' %}product{% else %}website{% endif %}">
+    {%- if seo_description != blank -%}
+      <meta property="og:description" content="{{ seo_description | strip_html | escape }}">
+    {%- endif -%}
+    {%- if seo_image != blank -%}
+      <meta property="og:image" content="https:{{ seo_image | image_url: width: 1200 }}">
+      <meta property="og:image:secure_url" content="https:{{ seo_image | image_url: width: 1200 }}">
+      <meta property="og:image:width" content="1200">
+    {%- endif -%}
+
+    <meta name="twitter:card" content="{% if seo_image != blank %}summary_large_image{% else %}summary{% endif %}">
+    <meta name="twitter:title" content="{{ seo_title | escape }}">
+    {%- if seo_description != blank -%}
+      <meta name="twitter:description" content="{{ seo_description | strip_html | escape }}">
+    {%- endif -%}
+    {%- if twitter_handle != blank -%}
+      <meta name="twitter:site" content="@{{ twitter_handle | remove: '@' }}">
+    {%- endif -%}
+    {%- if seo_image != blank -%}
+      <meta name="twitter:image" content="https:{{ seo_image | image_url: width: 1200 }}">
+    {%- endif -%}
+
+    {{ content_for_header }}
+
+    <style>
+  {{ settings.type_header_font | font_face: font_display: 'swap' }}
+  {{ settings.type_body_font | font_face: font_display: 'swap' }}
+</style>
+
+    <style>
+      :root {
+        --page-width: {{ settings.page_width }}px;
+        --section-gap: {{ settings.section_spacing }}px;
+        --radius-lg: {{ settings.radius_large }}px;
+        --color-bg: {{ settings.color_background }};
+        --color-surface: {{ settings.color_surface }};
+        --color-text: {{ settings.color_text }};
+        --color-heading: {{ settings.color_heading }};
+        --color-muted: {{ settings.color_muted }};
+        --color-border: {{ settings.color_border }};
+        --color-accent: {{ settings.color_accent }};
+        --color-dark: {{ settings.color_dark }};
+        --font-heading: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+        --font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+        --font-size-base: {{ settings.base_font_size }}px;
+      }
+    </style>
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'theme.js' | asset_url | preload_tag: as: 'script' }}
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  </head>
+  <body class="template-{{ template.name | handle }}">
+    <a class="skip-to-content-link" href="#MainContent">{{ 'accessibility.skip_to_text' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="content-for-layout" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+  </body>
+</html>

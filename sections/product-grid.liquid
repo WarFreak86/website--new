@@ -1,0 +1,51 @@
+<section class="section-shell">
+  <div class="page-width">
+    <h2 class="section-title">{{ section.settings.heading | escape }}</h2>
+    {%- assign source_collection = collections[section.settings.collection] -%}
+    {% if source_collection != blank %}
+      {% paginate source_collection.products by section.settings.products_per_page %}
+        <div class="category-grid product-grid__cards product-grid__cards--ratio-{{ section.settings.card_image_ratio }}">
+          {% for product in source_collection.products %}
+            {% render 'product-card', product: product %}
+          {% endfor %}
+        </div>
+        {% render 'pagination', paginate: paginate %}
+      {% endpaginate %}
+    {% else %}
+      <p>Select a collection to populate this grid.</p>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .product-grid__cards--ratio-square .product-card__media {
+    aspect-ratio: 1 / 1;
+  }
+
+  #shopify-section-{{ section.id }} .product-grid__cards--ratio-landscape .product-card__media {
+    aspect-ratio: 16 / 10;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Product grid",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Product grid" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 4, "max": 24, "step": 2, "default": 12 },
+    {
+      "type": "select",
+      "id": "card_image_ratio",
+      "label": "Card image ratio",
+      "default": "portrait",
+      "options": [
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "square", "label": "Square" },
+        { "value": "landscape", "label": "Landscape" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Product grid" }]
+}
+{% endschema %}

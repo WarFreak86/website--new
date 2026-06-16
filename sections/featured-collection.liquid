@@ -1,0 +1,53 @@
+<section class="section-shell" style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; background: {{ section.settings.background_color }}; color: {{ section.settings.text_color }};">
+  <div class="page-width" style="text-align: {{ section.settings.text_alignment }};">
+    <h2 class="section-title">{{ section.settings.heading | escape }}</h2>
+    {%- assign collection_ref = section.settings.collection -%}
+    {%- if collection_ref != blank and collection_ref.products_count > 0 -%}
+      <div class="category-grid featured-collection__grid featured-collection__grid--ratio-{{ section.settings.card_image_ratio }}">
+        {%- for product in collection_ref.products limit: section.settings.products_to_show -%}
+          {% render 'product-card', product: product %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p>Select a collection to show products.</p>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .featured-collection__grid--ratio-square .product-card__media {
+    aspect-ratio: 1 / 1;
+  }
+
+  #shopify-section-{{ section.id }} .featured-collection__grid--ratio-landscape .product-card__media {
+    aspect-ratio: 16 / 10;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Featured collection" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_to_show", "min": 2, "max": 12, "step": 1, "default": 6, "label": "Products to show" },
+    {
+      "type": "select",
+      "id": "card_image_ratio",
+      "label": "Card image ratio",
+      "default": "portrait",
+      "options": [
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "square", "label": "Square" },
+        { "value": "landscape", "label": "Landscape" }
+      ]
+    },
+    { "type": "select", "id": "text_alignment", "label": "Text alignment", "default": "center", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"}] },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#101113" },
+    { "type": "color", "id": "text_color", "label": "Section text color", "default": "#F4EFE6" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 160, "step": 4, "default": 64, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 160, "step": 4, "default": 64, "unit": "px" }
+  ],
+  "presets": [{ "name": "Featured collection" }]
+}
+{% endschema %}

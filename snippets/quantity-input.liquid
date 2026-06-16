@@ -1,0 +1,16 @@
+<div class="product-quantity" data-quantity-root>
+  <label for="Quantity-{{ section.id }}" class="product-quantity__label">Quantity</label>
+  <div class="product-quantity__controls">
+    <button type="button" class="product-quantity__button" data-quantity-decrease aria-label="Decrease quantity">-</button>
+    <input
+      id="Quantity-{{ section.id }}"
+      class="quantity-input product-quantity__input"
+      type="number"
+      name="quantity"
+      min="1"
+      value="1"
+      inputmode="numeric"
+    >
+    <button type="button" class="product-quantity__button" data-quantity-increase aria-label="Increase quantity">+</button>
+  </div>
+</div>

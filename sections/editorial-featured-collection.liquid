@@ -1,0 +1,436 @@
+{%- liquid
+  assign selected_collection = section.settings.collection
+  assign products_to_show = section.settings.products_to_show
+  assign ratio = section.settings.image_ratio
+  assign layout_style = section.settings.layout_style
+-%}
+
+<section
+  id="EditorialFeaturedCollection-{{ section.id }}"
+  class="editorial-featured-collection section-shell"
+  style="
+    --efc-card-gap: {{ section.settings.card_spacing }}px;
+    --efc-section-bg: {{ section.settings.background_color }};
+    --efc-section-text: {{ section.settings.text_color }};
+    --efc-intro-color: {{ section.settings.intro_color }};
+    --efc-card-bg: {{ section.settings.card_background_color }};
+    --efc-card-border: {{ section.settings.card_border_color }};
+    --efc-badge-bg: {{ section.settings.badge_background_color }};
+    --efc-badge-text: {{ section.settings.badge_text_color }};
+    --efc-accent-line: {{ section.settings.accent_line_color }};
+  "
+>
+  <div class="page-width editorial-featured-collection__inner">
+    <div class="editorial-featured-collection__header reveal-fade-up" data-reveal="deep">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="editorial-featured-collection__eyebrow label-kicker reveal-fade-up reveal-delay-1" data-reveal="subtle">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="section-title editorial-featured-collection__heading reveal-fade-up reveal-delay-2" data-reveal>{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.intro_text != blank -%}
+        <div class="editorial-featured-collection__intro rte reveal-fade-up reveal-delay-3" data-reveal="subtle">{{ section.settings.intro_text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
+        <a class="btn-premium editorial-featured-collection__cta reveal-fade-up reveal-delay-4" data-reveal="subtle" href="{{ section.settings.cta_link }}">{{ section.settings.cta_label | escape }}</a>
+      {%- endif -%}
+    </div>
+
+    {%- if selected_collection != blank and selected_collection.products_count > 0 -%}
+      <div class="editorial-featured-collection__grid editorial-featured-collection__grid--{{ layout_style }} editorial-featured-collection__grid--mobile-{{ section.settings.mobile_columns }} editorial-featured-collection__grid--image-{{ section.settings.product_image_size }}">
+        {%- for product in selected_collection.products limit: products_to_show -%}
+          <article class="editorial-featured-collection__card hover-subtle reveal-fade-up" data-reveal>
+            <a class="editorial-featured-collection__media-wrap" href="{{ product.url }}">
+              {%- if section.settings.badge_text != blank -%}
+                <span class="editorial-featured-collection__badge">{{ section.settings.badge_text | escape }}</span>
+              {%- endif -%}
+
+              {%- if product.featured_image != blank -%}
+                <div class="editorial-featured-collection__media editorial-featured-collection__media--{{ ratio }} image-hover-scale">
+                  {{
+                    product.featured_image
+                    | image_url: width: 2000
+                    | image_tag:
+                      class: 'editorial-featured-collection__image',
+                      loading: 'lazy',
+                      widths: '360, 533, 720, 940, 1200, 1600, 2000',
+                      sizes: '(min-width: 1200px) 36vw, (min-width: 750px) 50vw, 100vw',
+                      alt: product.title
+                  }}
+                </div>
+              {%- endif -%}
+
+              <span class="editorial-featured-collection__accent-line" aria-hidden="true"></span>
+            </a>
+
+            <div class="editorial-featured-collection__meta">
+              <h3 class="editorial-featured-collection__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+              {% render 'price', product_or_variant: product %}
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="editorial-featured-collection__empty value-card">
+        <p>Select a collection to display this section.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #EditorialFeaturedCollection-{{ section.id }} {
+    background: var(--efc-section-bg, var(--ds-color-bg, #050505));
+    color: var(--efc-section-text, var(--ds-color-text, #F4EFE6));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__header {
+    margin-bottom: var(--ds-space-6, 2rem);
+    max-width: 58rem;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__heading {
+    text-align: left;
+    margin-bottom: var(--ds-space-4, 1rem);
+    color: var(--efc-section-text, var(--ds-color-text-strong, #F4EFE6));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__eyebrow {
+    margin: 0 0 var(--ds-space-3, 0.75rem);
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__intro {
+    max-width: 54ch;
+    margin-bottom: var(--ds-space-5, 1.5rem);
+    color: var(--efc-intro-color, var(--ds-color-text-muted, #A7A29A));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid {
+    display: grid;
+    gap: clamp(var(--efc-card-gap), 1.8vw, calc(var(--efc-card-gap) + 8px));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--standard {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--editorial {
+    grid-template-columns: 1.2fr 0.8fr 1fr;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--feature_first {
+    grid-template-columns: 1.35fr 1fr;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--feature_first .editorial-featured-collection__card:first-child {
+    grid-row: span 2;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__card {
+    display: grid;
+    gap: 0.72rem;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media-wrap {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--ds-radius-md, 0.2rem);
+    background: var(--efc-card-bg, var(--ds-color-surface-1, #17181B));
+    border: 1px solid var(--efc-card-border, var(--ds-color-border, #2A2B2F));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media {
+    position: relative;
+    width: 100%;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media--adapt {
+    aspect-ratio: auto;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media--square {
+    aspect-ratio: 1 / 1;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media--portrait {
+    aspect-ratio: 4 / 5;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media--landscape {
+    aspect-ratio: 16 / 10;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--image-tall .editorial-featured-collection__media--portrait {
+    aspect-ratio: 3 / 4;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--image-compact .editorial-featured-collection__media--portrait {
+    aspect-ratio: 1 / 1.15;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--ds-time-slow, 360ms) var(--ds-ease-standard, ease);
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media-wrap:hover .editorial-featured-collection__image {
+    transform: scale(1.03);
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__accent-line {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: var(--efc-accent-line, var(--ds-color-accent, #C6FF3D));
+    transition: width var(--ds-time-base, 240ms) var(--ds-ease-standard, ease);
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media-wrap:hover .editorial-featured-collection__accent-line,
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__media-wrap:focus-visible .editorial-featured-collection__accent-line {
+    width: 100%;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+    padding: 0.22rem 0.52rem;
+    border: 1px solid color-mix(in srgb, var(--efc-card-border, var(--ds-color-border, #2A2B2F)) 72%, #ffffff 28%);
+    background: var(--efc-badge-bg, rgba(16, 17, 19, 0.82));
+    color: var(--efc-badge-text, var(--ds-color-text, #F4EFE6));
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__meta {
+    display: grid;
+    gap: 0.22rem;
+    transform: translateY(0);
+    transition: transform var(--ds-time-base, 240ms) var(--ds-ease-standard, ease), opacity var(--ds-time-base, 240ms) var(--ds-ease-standard, ease);
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__card:hover .editorial-featured-collection__meta {
+    transform: translateY(-2px);
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__title {
+    margin: 0;
+    font-family: var(--ds-font-product, var(--font-heading));
+    font-size: var(--ds-font-size-product, 1.05rem);
+    letter-spacing: 0.01em;
+    color: var(--efc-section-text, var(--ds-color-text-strong, #F4EFE6));
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #EditorialFeaturedCollection-{{ section.id }} .price,
+  #EditorialFeaturedCollection-{{ section.id }} .price * {
+    color: var(--efc-intro-color, var(--ds-color-text-muted, #A7A29A));
+  }
+
+  @media (max-width: 989px) {
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--standard,
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--editorial,
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--feature_first {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--feature_first .editorial-featured-collection__card:first-child {
+      grid-row: span 1;
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 749px) {
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--mobile-1 {
+      grid-template-columns: 1fr;
+    }
+
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--mobile-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #EditorialFeaturedCollection-{{ section.id }} .editorial-featured-collection__grid--feature_first .editorial-featured-collection__card:first-child {
+      grid-column: span 1;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Editorial Collection",
+  "tag": "section",
+  "class": "section-editorial-featured-collection",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Collector Drop"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Editorial Featured Collection"
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro text",
+      "default": "<p>Curated works from the latest archive release.</p>"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Product count",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "View full collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Optional badge text",
+      "info": "Examples: Limited Release, Archive, Collector Edition"
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Layout style",
+      "default": "editorial",
+      "options": [
+        { "value": "standard", "label": "Standard grid" },
+        { "value": "editorial", "label": "Editorial asymmetric" },
+        { "value": "feature_first", "label": "Large feature first" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "default": "portrait",
+      "options": [
+        { "value": "adapt", "label": "Adapt to image" },
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "landscape", "label": "Landscape" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "product_image_size",
+      "label": "Product image size feel",
+      "default": "default",
+      "options": [
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "tall", "label": "Tall" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "card_spacing",
+      "label": "Card spacing",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading and title color",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "color",
+      "id": "intro_color",
+      "label": "Intro and price color",
+      "default": "#A7A29A"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Card background",
+      "default": "#17181B"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border",
+      "default": "#2A2B2F"
+    },
+    {
+      "type": "color",
+      "id": "accent_line_color",
+      "label": "Accent line color",
+      "default": "#C6FF3D"
+    },
+    {
+      "type": "color",
+      "id": "badge_background_color",
+      "label": "Badge background",
+      "default": "#101113"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text color",
+      "default": "#F4EFE6"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Mobile columns",
+      "default": "1",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Featured Collection"
+    }
+  ]
+}
+{% endschema %}

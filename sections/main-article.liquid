@@ -1,0 +1,12 @@
+<section class="section-shell">
+  <article class="page-width">
+    {% render 'breadcrumbs' %}
+    <h1 class="section-title">{{ article.title }}</h1>
+    <p>{{ article.published_at | date: "%B %d, %Y" }}</p>
+    <div class="rte">{{ article.content }}</div>
+  </article>
+</section>
+
+{% schema %}
+{ "name": "Main article", "settings": [] }
+{% endschema %}

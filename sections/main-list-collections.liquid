@@ -1,0 +1,29 @@
+<section class="section-shell">
+  <div class="page-width">
+    <h1 class="section-title">{{ section.settings.heading | escape }}</h1>
+    {% paginate collections by section.settings.collections_per_page %}
+      <div class="category-grid">
+        {% for collection in collections %}
+          <article class="category-card">
+            {% render 'responsive-image', image: collection.featured_image, alt: collection.title, width: 1000 %}
+            <div class="category-card__overlay">
+              <h3>{{ collection.title }}</h3>
+              <a class="btn btn-primary" href="{{ collection.url }}">View collection</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+      {% render 'pagination', paginate: paginate %}
+    {% endpaginate %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Main list collections",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "All collections" },
+    { "type": "range", "id": "collections_per_page", "min": 6, "max": 36, "step": 2, "default": 12, "label": "Collections per page" }
+  ]
+}
+{% endschema %}

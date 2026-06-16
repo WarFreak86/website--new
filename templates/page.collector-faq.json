@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "hero": { "type": "lore-page-hero", "settings": { "eyebrow": "Support", "heading": "Collector FAQ", "text": "<p>Clear answers on editions, shipping, archive status, and release structure.</p>" } },
+    "faq": {
+      "type": "lore-faq",
+      "settings": { "eyebrow": "Questions", "heading": "Collector FAQ" },
+      "blocks": {
+        "q1": {"type":"faq","settings":{"question":"How often do new drops release?","answer":"<p>Render-Lab drops follow an irregular release rhythm. Join the archive list for advance windows.</p>"}},
+        "q2": {"type":"faq","settings":{"question":"Will sold-out editions return?","answer":"<p>Most limited editions do not restock. Archived works remain visible for collector reference.</p>"}},
+        "q3": {"type":"faq","settings":{"question":"How are works packaged?","answer":"<p>All shipments use reinforced packaging with tracked delivery to protect collector pieces in transit.</p>"}}
+      },
+      "block_order": ["q1","q2","q3"]
+    }
+  },
+  "order": ["hero", "faq"]
+}

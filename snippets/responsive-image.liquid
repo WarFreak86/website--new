@@ -1,0 +1,8 @@
+{%- assign media = image | default: product.featured_image -%}
+{%- if media != blank -%}
+  {%- assign resolved_width = width | default: 1200 -%}
+  {%- assign resolved_loading = loading | default: 'lazy' -%}
+  {%- assign resolved_sizes = sizes | default: '(min-width: 990px) 33vw, 100vw' -%}
+  {%- assign resolved_fetchpriority = fetchpriority | default: 'auto' -%}
+  {{ media | image_url: width: resolved_width | image_tag: loading: resolved_loading, alt: alt | default: media.alt, widths: '240, 360, 533, 720, 940, 1200, 1600', sizes: resolved_sizes, fetchpriority: resolved_fetchpriority }}
+{%- endif -%}

@@ -1,0 +1,203 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Render Grid",
+    "theme_version": "1.0.0",
+    "theme_author": "Codex",
+    "theme_documentation_url": "https://shopify.dev/docs/storefronts/themes",
+    "theme_support_url": "https://shopify.dev"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 80,
+        "max": 320,
+        "step": 10,
+        "default": 180,
+        "unit": "px",
+        "label": "Logo width"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon"
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_background",
+        "default": "#050505",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "default": "#17181B",
+        "label": "Surface"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "default": "#F4EFE6",
+        "label": "Text"
+      },
+      {
+        "type": "color",
+        "id": "color_heading",
+        "default": "#F4EFE6",
+        "label": "Headings"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "default": "#A7A29A",
+        "label": "Muted text"
+      },
+      {
+        "type": "color",
+        "id": "color_border",
+        "default": "#2A2B2F",
+        "label": "Border"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "default": "#C6FF3D",
+        "label": "Accent"
+      },
+      {
+        "type": "color",
+        "id": "color_dark",
+        "default": "#101113",
+        "label": "Dark"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_header_font",
+        "label": "Heading font",
+        "default": "space_grotesk_n7"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Body font",
+        "default": "inter_n4"
+      },
+      {
+        "type": "range",
+        "id": "base_font_size",
+        "label": "Base font size",
+        "min": 14,
+        "max": 20,
+        "step": 1,
+        "default": 16,
+        "unit": "px"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "min": 1000,
+        "max": 1680,
+        "step": 20,
+        "default": 1360,
+        "unit": "px",
+        "label": "Page width"
+      },
+      {
+        "type": "range",
+        "id": "section_spacing",
+        "min": 24,
+        "max": 120,
+        "step": 4,
+        "default": 64,
+        "unit": "px",
+        "label": "Vertical section spacing"
+      },
+      {
+        "type": "range",
+        "id": "radius_large",
+        "min": 0,
+        "max": 32,
+        "step": 1,
+        "default": 14,
+        "unit": "px",
+        "label": "Large corner radius"
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_twitter_handle",
+        "label": "Twitter/X handle"
+      },
+      {
+        "type": "url",
+        "id": "social_instagram_link",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "url",
+        "id": "social_tiktok_link",
+        "label": "TikTok URL"
+      },
+      {
+        "type": "url",
+        "id": "social_youtube_link",
+        "label": "YouTube URL"
+      }
+    ]
+  },
+  {
+    "name": "SEO",
+    "settings": [
+      {
+        "type": "text",
+        "id": "homepage_seo_title",
+        "label": "Homepage SEO title",
+        "default": "Render-Lab | Premium Canvas Prints, Metal Wall Art, and Collector Editions"
+      },
+      {
+        "type": "textarea",
+        "id": "homepage_seo_description",
+        "label": "Homepage SEO description",
+        "default": "Render-Lab creates premium canvas prints and metal wall art inspired by gaming culture, street signal, dark fantasy, and cinematic worlds for modern collectors."
+      },
+      {
+        "type": "textarea",
+        "id": "default_seo_description",
+        "label": "Default SEO description fallback",
+        "default": "Discover collector art prints, cinematic wall art, and limited editions from the Render-Lab archive."
+      },
+      {
+        "type": "image_picker",
+        "id": "seo_share_image",
+        "label": "Default social share image"
+      }
+    ]
+  }
+]

@@ -1,0 +1,44 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "lore-page-hero",
+      "settings": {
+        "eyebrow": "Render-Lab Manifesto",
+        "heading": "Manifesto",
+        "text": "<p>Render-Lab publishes collector works shaped by cinematic tension, street energy, and synthetic memory.</p>",
+        "cta_label": "Enter The Archive",
+        "cta_link": "shopify://collections/archive"
+      }
+    },
+    "manifesto": {
+      "type": "lore-manifesto-text",
+      "settings": {
+        "eyebrow": "Position",
+        "heading": "Digital Relics For Unquiet Rooms",
+        "text": "<p>We do not produce generic wall decor. Every release is built as an artifact: limited, intentional, and tied to a broader archive narrative.</p><p>Render-Lab lives at the intersection of underground visual culture, game-era iconography, and cinematic decay.</p>",
+        "cta_label": "View Current Drop",
+        "cta_link": "shopify://collections/limited-edition"
+      }
+    },
+    "split": {
+      "type": "lore-editorial-split",
+      "settings": {
+        "eyebrow": "Collector Position",
+        "heading": "Culture Over Commodity",
+        "text": "<p>Our editions are made for collectors who value tone, context, and permanence over trend cycles.</p>",
+        "cta_label": "Read The Lab",
+        "cta_link": "/pages/the-lab"
+      }
+    }
+  },
+  "order": ["hero", "manifesto", "split"]
+}
