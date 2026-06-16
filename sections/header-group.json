@@ -1,1 +1,37 @@
-{"name":"Header group","type":"header","sections":{"announcement_bar":{"type":"announcement-bar","settings":{"text":"Grand Opening: Free Shipping Sitewide","link_label":"","link":"shopify:\/\/collections\/limited-edition"}},"header":{"type":"header","settings":{"menu":"main-menu","show_search":true,"show_account":true,"show_cart":true,"sticky_header":true}}},"order":["announcement_bar","header"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Header group",
+  "type": "header",
+  "sections": {
+    "announcement_bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "text": "Free Shipping Sitewide",
+        "link_label": "",
+        "link": "shopify://collections/limited-edition"
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "menu": "main-menu",
+        "show_search": true,
+        "show_account": true,
+        "show_cart": true,
+        "sticky_header": true
+      }
+    }
+  },
+  "order": [
+    "announcement_bar",
+    "header"
+  ]
+}

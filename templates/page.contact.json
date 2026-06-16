@@ -1,1 +1,26 @@
-{"sections":{"main":{"type":"contact-form","settings":{"heading":"Contact Render-Lab","intro":"<p>Questions about an order, damaged shipment, custom request, or collector release? Send a message below and include your order number if you have one.</p>","order_heading":"Order issues","order_text":"Include your order number and the email used at checkout so support can find the purchase quickly.","damage_heading":"Damaged items","damage_text":"If an item arrives damaged, keep the packaging and include photos when replying to the support email.","collab_heading":"General inquiries","collab_text":"For collaborations, custom requests, or collector release questions, share the project details and timeline.","background_color":"#101113","text_color":"#F4EFE6","muted_text_color":"#A7A29A","border_color":"#2A2B2F","padding_top":64,"padding_bottom":64}}},"order":["main"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "contact-form",
+      "settings": {
+        "heading": "Contact Render-Lab",
+        "background_color": "#101113",
+        "text_color": "#F4EFE6",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
