@@ -1,7 +1,11 @@
 <section class="section-shell" style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; background: {{ section.settings.background_color }}; color: {{ section.settings.text_color }};">
   <div class="page-width" style="text-align: {{ section.settings.text_alignment }};">
-    <h2 class="section-title">{{ section.settings.heading | escape }}</h2>
-    <div class="rte">{{ section.settings.text }}</div>
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-title">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <div class="rte">{{ section.settings.text }}</div>
+    {%- endif -%}
     {%- if section.settings.button_label != blank -%}
       <a class="btn btn-primary" href="{{ section.settings.button_link }}">{{ section.settings.button_label | escape }}</a>
     {%- endif -%}

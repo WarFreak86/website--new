@@ -23,17 +23,10 @@
 
         <div class="collection-editorial-header__top collection-editorial-header__top--{{ section.settings.text_alignment }}">
           <div class="collection-editorial-header__copy reveal-fade-up reveal-delay-2" data-reveal>
-            {%- assign header_title = section.settings.custom_title | default: collection.title -%}
-            <h1 class="section-title collection-editorial-header__title">{{ header_title | escape }}</h1>
+            <h1 class="section-title collection-editorial-header__title">{{ collection.title | escape }}</h1>
 
-            {%- if section.settings.editorial_intro != blank -%}
-              <div class="collection-editorial-header__intro rte">{{ section.settings.editorial_intro }}</div>
-            {%- endif -%}
-
-            {%- if section.settings.description_source == 'collection' and collection.description != blank and section.settings.show_collection_description -%}
+            {%- if collection.description != blank and section.settings.show_collection_description -%}
               <div class="collection-editorial-header__description rte">{{ collection.description }}</div>
-            {%- elsif section.settings.description_source == 'custom' and section.settings.custom_description != blank -%}
-              <div class="collection-editorial-header__description rte">{{ section.settings.custom_description }}</div>
             {%- endif -%}
 
             <p class="collection-editorial-header__count">{{ collection.products_count }} products</p>
@@ -65,12 +58,29 @@
             <div class="collection-filters-drawer__panel">
               <form method="get" class="filters-form">
                 {%- for filter in collection.filters -%}
-                  {%- if filter.type == 'list' -%}
+                  {%- liquid
+                    assign filter_label_downcase = filter.label | downcase
+                    assign filter_param_downcase = filter.param_name | downcase
+                    assign is_availability_filter = false
+
+                    if filter_label_downcase contains 'availability'
+                      assign is_availability_filter = true
+                    endif
+
+                    if filter_label_downcase contains 'stock'
+                      assign is_availability_filter = true
+                    endif
+
+                    if filter_param_downcase contains 'availability'
+                      assign is_availability_filter = true
+                    endif
+                  -%}
+                  {%- if filter.type == 'list' and is_availability_filter == false -%}
                     <label for="Filter-{{ filter.param_name }}">{{ filter.label }}</label>
                     <select id="Filter-{{ filter.param_name }}" name="{{ filter.param_name }}">
                       <option value="">All</option>
                       {%- for filter_value in filter.values -%}
-                        <option value="{{ filter_value.value }}" {% if filter_value.active %}selected{% endif %}>{{ filter_value.label }} ({{ filter_value.count }})</option>
+                        <option value="{{ filter_value.value }}" {% if filter_value.active %}selected{% endif %}>{{ filter_value.label }}</option>
                       {%- endfor -%}
                     </select>
                   {%- elsif filter.type == 'price_range' -%}
@@ -90,9 +100,28 @@
 
           <div class="active-filters" aria-label="Active filters">
             {%- for filter in collection.filters -%}
-              {%- for value in filter.active_values -%}
-                <a class="active-filter-pill" href="{{ value.url_to_remove }}">{{ value.label }} ×</a>
-              {%- endfor -%}
+              {%- liquid
+                assign filter_label_downcase = filter.label | downcase
+                assign filter_param_downcase = filter.param_name | downcase
+                assign is_availability_filter = false
+
+                if filter_label_downcase contains 'availability'
+                  assign is_availability_filter = true
+                endif
+
+                if filter_label_downcase contains 'stock'
+                  assign is_availability_filter = true
+                endif
+
+                if filter_param_downcase contains 'availability'
+                  assign is_availability_filter = true
+                endif
+              -%}
+              {%- if is_availability_filter == false -%}
+                {%- for value in filter.active_values -%}
+                  <a class="active-filter-pill" href="{{ value.url_to_remove }}">{{ value.label }} ×</a>
+                {%- endfor -%}
+              {%- endif -%}
             {%- endfor -%}
           </div>
         {%- endif -%}
@@ -100,7 +129,24 @@
         {%- if section.settings.enable_sorting -%}
           <form method="get" class="sort-form">
             {%- for filter in collection.filters -%}
-              {%- if filter.type == 'list' -%}
+              {%- liquid
+                assign filter_label_downcase = filter.label | downcase
+                assign filter_param_downcase = filter.param_name | downcase
+                assign is_availability_filter = false
+
+                if filter_label_downcase contains 'availability'
+                  assign is_availability_filter = true
+                endif
+
+                if filter_label_downcase contains 'stock'
+                  assign is_availability_filter = true
+                endif
+
+                if filter_param_downcase contains 'availability'
+                  assign is_availability_filter = true
+                endif
+              -%}
+              {%- if filter.type == 'list' and is_availability_filter == false -%}
                 {%- for active_value in filter.active_values -%}
                   <input type="hidden" name="{{ filter.param_name }}" value="{{ active_value.value }}">
                 {%- endfor -%}
@@ -467,21 +513,8 @@
 {
   "name": "Main collection grid",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Collection Archive" },
-    { "type": "text", "id": "custom_title", "label": "Custom title (optional)" },
-    { "type": "richtext", "id": "editorial_intro", "label": "Editorial intro", "default": "<p>Curated works from the latest release cycle.</p>" },
-    {
-      "type": "select",
-      "id": "description_source",
-      "label": "Description source",
-      "default": "collection",
-      "options": [
-        { "value": "collection", "label": "Collection description" },
-        { "value": "custom", "label": "Custom description" }
-      ]
-    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
     { "type": "checkbox", "id": "show_collection_description", "label": "Show collection description", "default": true },
-    { "type": "richtext", "id": "custom_description", "label": "Custom description" },
     { "type": "checkbox", "id": "show_collection_hero_image", "label": "Show collection hero image", "default": true },
     { "type": "image_picker", "id": "custom_hero_image", "label": "Custom hero image (optional)" },
     { "type": "range", "id": "hero_overlay_opacity", "label": "Hero overlay opacity", "min": 0, "max": 80, "step": 5, "default": 30, "unit": "%" },

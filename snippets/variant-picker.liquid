@@ -11,9 +11,19 @@
       {%- liquid
         assign option_name_handle = option.name | handleize
         assign option_name_downcase = option.name | downcase
+        assign selected_option_value = ''
         assign is_material_option = false
         assign is_size_option = false
         assign use_option_cards = false
+
+        case option.position
+          when 1
+            assign selected_option_value = product.selected_or_first_available_variant.option1
+          when 2
+            assign selected_option_value = product.selected_or_first_available_variant.option2
+          when 3
+            assign selected_option_value = product.selected_or_first_available_variant.option3
+        endcase
 
         if option_name_downcase contains 'material' or option_name_downcase contains 'medium' or option_name_downcase contains 'finish' or option_name_downcase == 'type'
           assign is_material_option = true
@@ -50,7 +60,7 @@
           {% if use_option_cards %}data-premium-option-source{% endif %}
         >
           {%- for value in option.values -%}
-            <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+            <option value="{{ value | escape }}" {% if selected_option_value == value %}selected{% endif %}>{{ value }}</option>
           {%- endfor -%}
         </select>
 
@@ -80,18 +90,18 @@
               -%}
               <button
                 type="button"
-                class="premium-option-card{% if option.selected_value == value %} is-selected{% endif %}"
+                class="premium-option-card{% if selected_option_value == value %} is-selected{% endif %}"
                 role="radio"
-                aria-checked="{% if option.selected_value == value %}true{% else %}false{% endif %}"
+                aria-checked="{% if selected_option_value == value %}true{% else %}false{% endif %}"
                 data-premium-option-card
                 data-option-value="{{ value | escape }}"
-                tabindex="{% if option.selected_value == value %}0{% else %}-1{% endif %}"
+                tabindex="{% if selected_option_value == value %}0{% else %}-1{% endif %}"
               >
                 <span class="premium-option-card__label">{{ value }}</span>
                 {%- if helper_copy != blank -%}
                   <span class="premium-option-card__helper">{{ helper_copy }}</span>
                 {%- endif -%}
-                <span class="premium-option-card__state" data-option-state>Selected</span>
+                <span class="premium-option-card__state" data-option-state>{% if selected_option_value == value %}Selected{% endif %}</span>
               </button>
             {%- endfor -%}
           </div>
