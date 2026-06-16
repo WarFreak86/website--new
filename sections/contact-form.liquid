@@ -43,7 +43,7 @@
           {% endif %}
 
           <label for="ContactName-{{ section.id }}">Name</label>
-          <input id="ContactName-{{ section.id }}" type="text" name="contact[name]" value="{{ form.name }}" autocomplete="name">
+          <input id="ContactName-{{ section.id }}" type="text" name="contact[name]" value="{{ form.name }}" autocomplete="name" required>
 
           <label for="ContactEmail-{{ section.id }}">Email</label>
           <input id="ContactEmail-{{ section.id }}" type="email" name="contact[email]" value="{{ form.email }}" autocomplete="email" required>
@@ -51,10 +51,20 @@
           <label for="ContactOrder-{{ section.id }}">Order number</label>
           <input id="ContactOrder-{{ section.id }}" type="text" name="contact[order_number]" autocomplete="off">
 
+          <label for="ContactInquiryType-{{ section.id }}">Inquiry type</label>
+          <select id="ContactInquiryType-{{ section.id }}" name="contact[inquiry_type]" required>
+            <option value="Order question">Order question</option>
+            <option value="Damaged shipment">Damaged shipment</option>
+            <option value="Production / shipping timing">Production / shipping timing</option>
+            <option value="Collector release inquiry">Collector release inquiry</option>
+            <option value="Custom / collaboration request">Custom / collaboration request</option>
+            <option value="General question">General question</option>
+          </select>
+
           <label for="ContactBody-{{ section.id }}">Message</label>
           <textarea id="ContactBody-{{ section.id }}" name="contact[body]" rows="7" required>{{ form.body }}</textarea>
 
-          <button class="btn btn-primary" type="submit">Send message</button>
+          <button class="btn btn-primary" type="submit">Send Message</button>
         {% endform %}
       </div>
     </div>
@@ -125,6 +135,7 @@
   }
 
   #shopify-section-{{ section.id }} .contact-form input,
+  #shopify-section-{{ section.id }} .contact-form select,
   #shopify-section-{{ section.id }} .contact-form textarea {
     width: 100%;
   }
@@ -145,13 +156,13 @@
   "name": "Contact form",
   "settings": [
     { "type": "text", "id": "heading", "label": "Heading", "default": "Contact Render-Lab" },
-    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>Questions about an order, damaged shipment, custom request, or collector release? Send a message below and include your order number if you have one.</p>" },
-    { "type": "text", "id": "order_heading", "label": "Order heading", "default": "Order issues" },
-    { "type": "text", "id": "order_text", "label": "Order text", "default": "Include your order number and the email used at checkout so support can find the purchase quickly." },
-    { "type": "text", "id": "damage_heading", "label": "Damage heading", "default": "Damaged shipments" },
-    { "type": "text", "id": "damage_text", "label": "Damage text", "default": "Attach clear photos when replying to the support email and report transit damage within 48 hours of delivery." },
-    { "type": "text", "id": "collab_heading", "label": "Inquiry heading", "default": "Collaborations and requests" },
-    { "type": "text", "id": "collab_text", "label": "Inquiry text", "default": "For custom requests, collector releases, or general inquiries, share the project details and timeline." },
+    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>Questions about an order, damaged shipment, production timing, collector releases, or custom work? Send a message below and include your order number if you have one.</p>" },
+    { "type": "text", "id": "order_heading", "label": "Order heading", "default": "Order Questions" },
+    { "type": "text", "id": "order_text", "label": "Order text", "default": "For questions about an existing order, include your order number and the email used at checkout." },
+    { "type": "text", "id": "damage_heading", "label": "Damage heading", "default": "Damaged Shipment" },
+    { "type": "text", "id": "damage_text", "label": "Damage text", "default": "If your print arrives damaged, contact us with clear photos of the packaging and product so we can review the issue quickly." },
+    { "type": "text", "id": "collab_heading", "label": "Inquiry heading", "default": "Collector / Collaboration Inquiries" },
+    { "type": "text", "id": "collab_text", "label": "Inquiry text", "default": "For limited releases, custom projects, or brand collaborations, send a short description of what you are looking for." },
     { "type": "color", "id": "background_color", "label": "Section background", "default": "#101113" },
     { "type": "color", "id": "text_color", "label": "Section text color", "default": "#F4EFE6" },
     { "type": "color", "id": "muted_text_color", "label": "Muted text color", "default": "#A7A29A" },
